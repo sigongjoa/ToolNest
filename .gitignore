@@ -1,0 +1,38 @@
+# dependencies
+node_modules/
+ai-tool-recommender/node_modules/
+recommender-app/node_modules/
+ToolReviewHub/node_modules/
+ToolReviewHub/client/node_modules/
+ToolReviewHub/server/node_modules/
+
+# next.js
+.next/
+out/
+
+# production
+build/
+dist/
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# env files
+.env*
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+
+# gitignore for nested git repos (if they were accidentally initialized)
+ai-tool-recommender/.git/
+recommender-app/.git/
+ToolReviewHub/.git/
+
+# Logs
+*.log 
