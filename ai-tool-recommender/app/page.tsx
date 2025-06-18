@@ -10,6 +10,8 @@ import { Badge } from "@/components/ui/badge"
 import { Sparkles, Search, Zap, Brain, Loader2, ArrowRight } from "lucide-react"
 import { initializeWebLLMEngine, getEmbedding } from "../lib/webLLMClient"
 import type { InitProgressReport } from "@mlc-ai/web-llm";
+import { recommendAITools, loadAIData } from "../lib/recommender";
+import { debug } from "../lib/utils";
 
 interface AITool {
   id: string;
@@ -61,7 +63,7 @@ export default function AIToolRecommender() {
         });
     }
 
-    console.debug('ai_tools.json 데이터 로드 시작');
+    console.debug('ai_tools.json 데이터 로드 시작 (모든 AI 도구 표시용)');
     fetch('/data/ai_tools.json')
       .then(response => {
         console.debug('ai_tools.json 응답 수신');
@@ -94,40 +96,17 @@ export default function AIToolRecommender() {
     setIsLoading(true)
     setWebLLMLog((prev) => [...prev, `쿼리 임베딩 시작: ${query.substring(0, 30)}...`]);
     try {
-      const embedding = await getEmbedding(query);
-      console.debug('임베딩 결과:', embedding ? '성공' : '실패');
-      setWebLLMLog((prev) => [...prev, `임베딩 완료 (첫 5개 요소): ${embedding?.slice(0, 5).map(e => e.toFixed(4)).join(', ')}`]);
-      // Simulate API call
-      setTimeout(() => {
-        setRecommendations([
-          {
-            name: "ChatGPT",
-            category: "텍스트 생성",
-            description: "대화형 AI로 텍스트 생성, 번역, 요약 등 다양한 작업을 수행할 수 있습니다.",
-            rating: 4.8,
-            pricing: "무료/유료",
-          },
-          {
-            name: "Midjourney",
-            category: "이미지 생성",
-            description: "텍스트 프롬프트를 통해 고품질의 AI 이미지를 생성하는 도구입니다.",
-            rating: 4.7,
-            pricing: "유료",
-          },
-          {
-            name: "Notion AI",
-            category: "생산성",
-            description: "노션 내에서 글쓰기, 요약, 번역 등을 도와주는 AI 어시스턴트입니다.",
-            rating: 4.6,
-            pricing: "무료/유료",
-          },
-        ])
-        setIsLoading(false)
-        console.debug('추천 시뮬레이션 완료');
-      }, 2000)
+      console.debug('recommender.ts에서 데이터 로드 시작 (필요한 경우)');
+      await loadAIData(); // Ensure data is loaded in recommender.ts
+      console.debug('recommendAITools 호출 시작');
+      const recommendedTools = await recommendAITools(query);
+      console.debug('recommendAITools 호출 완료. 추천 도구 수:', recommendedTools.length);
+      setRecommendations(recommendedTools);
+      setIsLoading(false);
+      setWebLLMLog((prev) => [...prev, `추천 완료: ${recommendedTools.length}개 도구 추천됨`]);
     } catch (error) {
-      console.error('임베딩 중 오류 발생:', error);
-      setWebLLMLog((prev) => [...prev, `임베딩 중 오류 발생: ${(error as Error).message}`]);
+      console.error('추천 중 오류 발생:', error);
+      setWebLLMLog((prev) => [...prev, `추천 중 오류 발생: ${(error as Error).message}`]);
       setIsLoading(false);
     }
   }
