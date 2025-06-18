@@ -11,13 +11,29 @@ import { Sparkles, Search, Zap, Brain, Loader2, ArrowRight } from "lucide-react"
 import { initializeWebLLMEngine, getEmbedding } from "../lib/webLLMClient"
 import type { InitProgressReport } from "@mlc-ai/web-llm";
 
+interface AITool {
+  id: string;
+  name: string;
+  description: string;
+  features: string[];
+  use_cases: string[];
+  category: string;
+  tags: string[];
+  url: string;
+  image_url: string;
+  rating: number;
+  reviews: number;
+}
+
 export default function AIToolRecommender() {
+  console.debug('AIToolRecommender 컴포넌트 시작');
   const [query, setQuery] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [recommendations, setRecommendations] = useState<any[]>([])
   const [webLLMLog, setWebLLMLog] = useState<string[]>([])
   const [isWebLLMLoading, setIsWebLLMLoading] = useState(false)
   const [isWebLLMInitialized, setIsWebLLMInitialized] = useState(false)
+  const [allAITools, setAllAITools] = useState<AITool[]>([]);
 
   useEffect(() => {
     console.debug('AIToolRecommender 컴포넌트 마운트됨');
@@ -44,6 +60,27 @@ export default function AIToolRecommender() {
           setIsWebLLMLoading(false);
         });
     }
+
+    console.debug('ai_tools.json 데이터 로드 시작');
+    fetch('/data/ai_tools.json')
+      .then(response => {
+        console.debug('ai_tools.json 응답 수신');
+        if (!response.ok) {
+          throw new Error(`HTTP 오류! 상태: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then((data: AITool[]) => {
+        console.debug('ai_tools.json 데이터 파싱 완료', data.length);
+        console.debug('allAITools 상태 업데이트');
+        setAllAITools(data);
+        console.debug('allAITools 상태 업데이트 완료');
+      })
+      .catch(error => {
+        console.error('ai_tools.json 로드 중 오류 발생:', error);
+        console.debug('ai_tools.json 로드 실패');
+      });
+
   }, [isWebLLMInitialized, isWebLLMLoading]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -117,7 +154,8 @@ export default function AIToolRecommender() {
         </div>
 
         {/* Main Search Form */}
-        <div className="max-w-4xl mx-auto mb-12">
+        <div className="max-w-6xl mx-auto mb-12 grid grid-cols-1 md:grid-cols-2 gap-8">
+          {/* AI Tool Recommendation Section */}
           <Card className="border-0 shadow-xl bg-white/80 backdrop-blur-sm">
             <CardContent className="p-8">
               <form onSubmit={handleSubmit} className="space-y-6">
@@ -129,7 +167,10 @@ export default function AIToolRecommender() {
                   <Textarea
                     id="query"
                     value={query}
-                    onChange={(e) => setQuery(e.target.value)}
+                    onChange={(e) => {
+                      console.debug('쿼리 변경 감지', e.target.value);
+                      setQuery(e.target.value);
+                    }}
                     placeholder="예: 문서 요약해 주는 AI 도구를 찾고 있습니다. 한글 지원이 되고, 무료로 사용할 수 있으면 좋겠어요. 또는, 이미지를 생성하고 편집하는 데 도움이 되는 AI 도구를 추천해 주세요."
                     className="min-h-[120px] text-base resize-none border-slate-200 focus:border-blue-500 focus:ring-blue-500/20"
                   />
@@ -159,96 +200,85 @@ export default function AIToolRecommender() {
                   )}
                 </Button>
               </form>
+              {recommendations.length > 0 && (
+                <div className="mt-8">
+                  <h3 className="text-xl font-semibold text-slate-700 mb-4 flex items-center gap-2">
+                    <Zap className="w-5 h-5 text-yellow-500" />
+                    추천 AI 도구
+                  </h3>
+                  <div className="grid grid-cols-1 gap-4">
+                    {recommendations.map((tool, index) => (
+                      <Card key={index} className="border-l-4 border-blue-500 shadow-md hover:shadow-lg transition-all duration-200">
+                        <CardContent className="p-4 flex items-center justify-between">
+                          <div className="flex-grow">
+                            <h4 className="text-lg font-semibold text-slate-800">{tool.name}</h4>
+                            <p className="text-slate-600 text-sm">{tool.description}</p>
+                          </div>
+                          <Badge variant="secondary" className="ml-4">{tool.category}</Badge>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                </div>
+              )}
             </CardContent>
           </Card>
-        </div>
 
-        {/* WebLLM Log Display */}
-        <div className="max-w-4xl mx-auto mb-12">
+          {/* All AI Tools Section */}
           <Card className="border-0 shadow-xl bg-white/80 backdrop-blur-sm">
-            <CardContent className="p-6">
-              <h3 className="text-xl font-semibold text-slate-700 mb-4">WebLLM 로그</h3>
-              <div className="bg-slate-100 p-4 rounded-md h-48 overflow-y-auto text-sm font-mono text-slate-700">
-                {webLLMLog.length > 0 ? (
-                  webLLMLog.map((log, index) => (
-                    <p key={index}>{log}</p>
-                  ))
-                ) : (
-                  <p>WebLLM 초기화 대기 중...</p>
-                )}
+            <CardContent className="p-8">
+              <h3 className="text-xl font-semibold text-slate-700 mb-4">모든 AI 도구 목록</h3>
+              {allAITools.length === 0 && (
+                <p className="text-slate-600">AI 도구를 불러오는 중입니다...</p>
+              )}
+              <div className="grid md:grid-cols-2 lg:grid-cols-2 gap-6">
+                {allAITools.map((tool) => (
+                  <Card
+                    key={tool.id}
+                    className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 bg-white/90 backdrop-blur-sm hover:scale-105"
+                  >
+                    <CardContent className="p-6">
+                      <div className="space-y-4">
+                        <div className="flex items-start justify-between">
+                          <h3 className="text-xl font-bold text-slate-800">{tool.name}</h3>
+                          <Badge variant="outline" className="text-xs">
+                            {tool.category}
+                          </Badge>
+                        </div>
+                        <p className="text-slate-600 text-sm leading-relaxed">{tool.description}</p>
+                        <div className="flex items-center justify-between pt-2">
+                          <div className="flex items-center gap-1">
+                            <div className="flex text-yellow-400">{"★".repeat(Math.floor(tool.rating))}</div>
+                            <span className="text-sm text-slate-500 ml-1">{tool.rating}</span>
+                          </div>
+                          <Badge variant="secondary" className="text-xs">
+                            {tool.tags.join(', ')}
+                          </Badge>
+                        </div>
+                        <Button variant="outline" className="w-full mt-4 hover:bg-blue-50 hover:border-blue-300" onClick={() => window.open(tool.url, '_blank')}>
+                          자세히 보기
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
               </div>
             </CardContent>
           </Card>
         </div>
 
-        {/* Popular Queries */}
-        {!recommendations.length && (
-          <div className="max-w-4xl mx-auto mb-12">
-            <h3 className="text-xl font-semibold text-slate-700 mb-4 text-center">인기 검색어</h3>
-            <div className="flex flex-wrap justify-center gap-3">
-              {popularQueries.map((query, index) => (
-                <Badge
-                  key={index}
-                  variant="secondary"
-                  className="px-4 py-2 text-sm cursor-pointer hover:bg-blue-100 hover:text-blue-700 transition-colors"
-                  onClick={() => setQuery(query)}
-                >
-                  {query}
-                </Badge>
+        {/* WebLLM Log */}
+        <div className="max-w-4xl mx-auto mt-8">
+          <h2 className="text-2xl font-bold text-slate-800 mb-4">WebLLM 로그</h2>
+          <Card className="border-0 shadow-xl bg-white/80 backdrop-blur-sm">
+            <CardContent className="p-6 h-64 overflow-y-auto">
+              {webLLMLog.length === 0 && <p className="text-slate-600">WebLLM 로드가 시작되기를 기다리는 중...</p>}
+              {webLLMLog.map((log, index) => (
+                <p key={index} className="font-mono text-sm text-slate-700">{log}</p>
               ))}
-            </div>
-          </div>
-        )}
-
-        {/* Recommendations */}
-        {recommendations.length > 0 && (
-          <div className="max-w-6xl mx-auto">
-            <h2 className="text-2xl font-bold text-slate-800 mb-6 flex items-center gap-2">
-              <Zap className="w-6 h-6 text-yellow-500" />
-              추천 AI 도구
-            </h2>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {recommendations.map((tool, index) => (
-                <Card
-                  key={index}
-                  className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 bg-white/90 backdrop-blur-sm hover:scale-105"
-                >
-                  <CardContent className="p-6">
-                    <div className="space-y-4">
-                      <div className="flex items-start justify-between">
-                        <h3 className="text-xl font-bold text-slate-800">{tool.name}</h3>
-                        <Badge variant="outline" className="text-xs">
-                          {tool.category}
-                        </Badge>
-                      </div>
-
-                      <p className="text-slate-600 text-sm leading-relaxed">{tool.description}</p>
-
-                      <div className="flex items-center justify-between pt-2">
-                        <div className="flex items-center gap-1">
-                          <div className="flex text-yellow-400">{"★".repeat(Math.floor(tool.rating))}</div>
-                          <span className="text-sm text-slate-500 ml-1">{tool.rating}</span>
-                        </div>
-                        <Badge variant="secondary" className="text-xs">
-                          {tool.pricing}
-                        </Badge>
-                      </div>
-
-                      <Button variant="outline" className="w-full mt-4 hover:bg-blue-50 hover:border-blue-300">
-                        자세히 보기
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Footer */}
-        <footer className="text-center mt-16 pt-8 border-t border-slate-200">
-          <p className="text-slate-500 text-sm">© 2024 AI Tool Recommender. All rights reserved.</p>
-        </footer>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   )
