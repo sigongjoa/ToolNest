@@ -1,3 +1,21 @@
+# Recommender App (추천 시스템 클라이언트)
+
+이 폴더는 독립적인 추천 시스템 웹 애플리케이션의 클라이언트 측 코드를 포함합니다. 이 애플리케이션은 사용자에게 AI 도구를 추천하고 관련 정보를 표시하는 데 중점을 둡니다.
+
+## 주요 기능
+- **데이터 로딩**: 추천에 필요한 데이터를 로드하고 처리
+- **추천 알고리즘 실행**: 클라이언트 측에서 추천 알고리즘을 실행하여 도구 추천
+- **UI 렌더링**: 사용자 인터페이스를 통해 추천 결과를 시각적으로 표시
+
+## 기술 스택
+- **Vite**: 빠른 개발 환경을 위한 빌드 도구
+- **React**: 사용자 인터페이스 구축을 위한 JavaScript 라이브러리
+- **TypeScript**: 타입 안정성을 위한 프로그래밍 언어
+- **Tailwind CSS**: 효율적인 UI 스타일링
+- **WebLLM**: 클라이언트 측 AI 모델 실행을 위한 라이브러리
+
+이 애플리케이션은 AI 도구 추천의 핵심 로직을 담당하며, 독립적으로 실행될 수 있도록 설계되었습니다.
+
 # React + TypeScript + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
@@ -52,5 +70,3 @@ export default tseslint.config({
   },
 })
 ```
-
-이 폴더는 추천 시스템 웹 애플리케이션을 포함합니다.
