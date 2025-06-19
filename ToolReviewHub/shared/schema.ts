@@ -1,6 +1,7 @@
 import { pgTable, text, serial, integer, real } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
+import { ITool, IReview } from "../../shared/types";
 
 export const tools = pgTable("tools", {
   id: serial("id").primaryKey(),
@@ -10,6 +11,7 @@ export const tools = pgTable("tools", {
   description: text("description").notNull(),
   rating: real("rating").notNull(),
   imageUrl: text("image_url").notNull(),
+  url: text("url").notNull(),
 });
 
 export const reviews = pgTable("reviews", {
@@ -31,9 +33,9 @@ export const insertReviewSchema = createInsertSchema(reviews).omit({
 });
 
 export type InsertTool = z.infer<typeof insertToolSchema>;
-export type Tool = typeof tools.$inferSelect;
+export type Tool = ITool;
 export type InsertReview = z.infer<typeof insertReviewSchema>;
-export type Review = typeof reviews.$inferSelect;
+export type Review = IReview;
 
 export type ToolWithReview = Tool & {
   review?: Review;

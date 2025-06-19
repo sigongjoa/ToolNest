@@ -9,7 +9,7 @@ export default function Header() {
           <div className="flex items-center">
             <Link href="/">
               <h1 className="text-2xl font-bold text-primary cursor-pointer">
-                ToolReview Hub
+                툴 리뷰 허브
               </h1>
             </Link>
           </div>
@@ -19,20 +19,38 @@ export default function Header() {
               href="/" 
               className="text-neutral-600 hover:text-primary transition-colors"
             >
-              Home
+              홈
             </Link>
-            <a 
+            <Link 
+              href="/ai-sites" 
+              className="text-neutral-600 hover:text-primary transition-colors"
+            >
+              AI 사이트
+            </Link>
+            <Link 
+              href="/useful-sites" 
+              className="text-neutral-600 hover:text-primary transition-colors"
+            >
+              유용한 사이트
+            </Link>
+            <Link 
+              href="/officeworker-ai-sites" 
+              className="text-neutral-600 hover:text-primary transition-colors"
+            >
+              직장인 AI 사이트
+            </Link>
+            <Link 
+              href="/student-ai-sites" 
+              className="text-neutral-600 hover:text-primary transition-colors"
+            >
+              학생 AI 사이트
+            </Link>
+            <Link 
               href="#" 
               className="text-neutral-600 hover:text-primary transition-colors"
             >
-              Categories
-            </a>
-            <a 
-              href="#" 
-              className="text-neutral-600 hover:text-primary transition-colors"
-            >
-              About
-            </a>
+              소개
+            </Link>
           </nav>
           
           <button className="md:hidden p-2 rounded-md hover:bg-neutral-100">

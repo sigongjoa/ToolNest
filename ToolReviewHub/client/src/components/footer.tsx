@@ -4,34 +4,34 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div>
-            <h3 className="text-xl font-bold mb-4">ToolReview Hub</h3>
+            <h3 className="text-xl font-bold mb-4">툴 리뷰 허브</h3>
             <p className="text-neutral-400 leading-relaxed">
-              Professional tool reviews and ratings to help you make informed decisions for your workflow.
+              워크플로우에 대한 정보에 입각한 결정을 내릴 수 있도록 전문적인 도구 리뷰 및 평점을 제공합니다.
             </p>
           </div>
           
           <div>
-            <h4 className="font-semibold mb-4">Categories</h4>
+            <h4 className="font-semibold mb-4">카테고리</h4>
             <ul className="space-y-2 text-neutral-400">
-              <li><a href="#" className="hover:text-white transition-colors">Code Editors</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Design Tools</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Productivity</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Development</a></li>
+              <li><a href="#" className="hover:text-white transition-colors">코드 편집기</a></li>
+              <li><a href="#" className="hover:text-white transition-colors">디자인 도구</a></li>
+              <li><a href="#" className="hover:text-white transition-colors">생산성</a></li>
+              <li><a href="#" className="hover:text-white transition-colors">개발</a></li>
             </ul>
           </div>
           
           <div>
-            <h4 className="font-semibold mb-4">Company</h4>
+            <h4 className="font-semibold mb-4">회사</h4>
             <ul className="space-y-2 text-neutral-400">
-              <li><a href="#" className="hover:text-white transition-colors">About Us</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Contact</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Privacy Policy</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Terms of Service</a></li>
+              <li><a href="#" className="hover:text-white transition-colors">회사 소개</a></li>
+              <li><a href="#" className="hover:text-white transition-colors">문의</a></li>
+              <li><a href="#" className="hover:text-white transition-colors">개인정보처리방침</a></li>
+              <li><a href="#" className="hover:text-white transition-colors">서비스 약관</a></li>
             </ul>
           </div>
           
           <div>
-            <h4 className="font-semibold mb-4">Follow Us</h4>
+            <h4 className="font-semibold mb-4">팔로우하기</h4>
             <div className="flex space-x-4">
               <a href="#" className="text-neutral-400 hover:text-white transition-colors">
                 <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
@@ -53,7 +53,7 @@ export default function Footer() {
         </div>
         
         <div className="border-t border-neutral-800 mt-8 pt-8 text-center">
-          <p className="text-neutral-400">&copy; 2024 ToolReview Hub. All rights reserved.</p>
+          <p className="text-neutral-400">&copy; 2024 툴 리뷰 허브. 모든 권리 보유.</p>
         </div>
       </div>
     </footer>

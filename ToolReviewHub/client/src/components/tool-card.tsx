@@ -41,7 +41,7 @@ export default function ToolCard({ tool }: ToolCardProps) {
           className="inline-flex items-center text-primary hover:text-blue-700 font-medium transition-colors"
         >
           <Play className="w-4 h-4 mr-2" />
-          Read Review
+          리뷰 읽기
         </Link>
       </div>
     </article>

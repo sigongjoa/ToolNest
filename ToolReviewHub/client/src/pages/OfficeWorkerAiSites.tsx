@@ -1,10 +1,12 @@
 import Header from "@/components/header";
 import Footer from "@/components/footer";
 import ToolCard from "@/components/tool-card";
-import { tools, ITool } from "../../../../shared/types";
+import { tools } from "../../../../shared/types";
 
-export default function Home() {
-  console.debug('Home 컴포넌트 시작');
+export default function OfficeWorkerAiSites() {
+  console.debug('OfficeWorkerAiSites 컴포넌트 시작');
+  // 'Business AI' 카테고리에 해당하는 도구만 필터링하여 표시합니다.
+  const filteredTools = tools.filter(tool => tool.category === "Business AI");
 
   return (
     <div className="min-h-screen bg-neutral-50">
@@ -15,15 +17,15 @@ export default function Home() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-12">
               <h2 className="text-4xl font-bold text-neutral-900 mb-4">
-                전문 도구 리뷰
+                직장인 AI 사이트
               </h2>
               <p className="text-xl text-neutral-600 max-w-3xl mx-auto">
-                업계 전문가의 종합적인 리뷰 및 평점을 통해 워크플로우에 가장 적합한 도구를 찾아보세요.
+                직장인들을 위한 유용한 AI 사이트들을 모아봤습니다.
               </p>
             </div>
 
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {tools.map((tool) => <ToolCard key={tool.id} tool={tool} />)}
+              {filteredTools.map((tool) => <ToolCard key={tool.id} tool={tool} />)}
             </div>
           </div>
         </section>
@@ -32,4 +34,4 @@ export default function Home() {
       <Footer />
     </div>
   );
-}
+} 
