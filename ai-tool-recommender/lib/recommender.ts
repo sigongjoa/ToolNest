@@ -1,5 +1,5 @@
-import { getEmbedding } from "./webLLMClient";
-import { cosineSimilarity, debug } from "./utils";
+import { generateCompletion } from "./webLLMClient";
+import { debug } from "./utils";
 
 interface AITool {
   id: string;
@@ -15,13 +15,7 @@ interface AITool {
   reviews: number;
 }
 
-interface AIToolEmbedding {
-  id: string;
-  embedding: number[];
-}
-
 let allAITools: AITool[] = [];
-let allAIToolEmbeddings: AIToolEmbedding[] = [];
 let dataLoaded = false;
 
 export const loadAIData = async () => {
@@ -40,14 +34,6 @@ export const loadAIData = async () => {
     allAITools = (await toolsResponse.json()) as AITool[];
     debug('ai_tools.json 로드 완료. 도구 수:', allAITools.length);
 
-    debug('embeddings.json 로드 시작');
-    const embeddingsResponse = await fetch('/data/embeddings.json');
-    if (!embeddingsResponse.ok) {
-      throw new Error(`HTTP 오류! 상태: ${embeddingsResponse.status}`);
-    }
-    allAIToolEmbeddings = (await embeddingsResponse.json()) as AIToolEmbedding[];
-    debug('embeddings.json 로드 완료. 임베딩 수:', allAIToolEmbeddings.length);
-
     dataLoaded = true;
     debug('모든 AI 데이터 로드 완료.');
   } catch (error) {
@@ -58,45 +44,48 @@ export const loadAIData = async () => {
   debug('loadAIData 함수 종료');
 };
 
-export const recommendAITools = async (userQuery: string, topN: number = 5): Promise<AITool[]> => {
+export const recommendAITools = async (userQuery: string): Promise<{ recommendedTools: AITool[], explanation: string }> => {
   debug('recommendAITools 함수 진입 - 쿼리:', userQuery);
   if (!dataLoaded) {
     debug('데이터가 로드되지 않았으므로 먼저 로드합니다.');
     await loadAIData();
   }
 
-  debug('사용자 쿼리 임베딩 생성 시작');
-  const userEmbedding = await getEmbedding(userQuery);
-  if (!userEmbedding) {
-    debug('사용자 쿼리 임베딩 생성 실패. 빈 배열 반환.');
-    return [];
-  }
-  debug('사용자 쿼리 임베딩 생성 완료 (첫 5개 요소): ', userEmbedding.slice(0, 5));
+  // Construct prompt for LLM
+  let prompt = `사용자의 쿼리: "${userQuery}"\n\n`;
+  prompt += `다음은 사용 가능한 AI 도구 목록입니다. 각 도구는 ID, 이름, 설명, 특징, 사용 사례, 카테고리, 태그를 포함합니다. 이 도구 목록 중에서 사용자의 쿼리에 가장 적합한 도구를 3-5개 추천하고, 그 이유를 설명해 주세요. 추천하는 도구의 이름만 먼저 나열한 다음, 각 도구가 사용자의 쿼리와 어떻게 관련되어 있고 어떤 면에서 유용한지 친절하게 설명해 주세요. 최대 300단어로 제한합니다. 추천 도구 목록은 다음과 같습니다:\n\n`;
 
-  const scoredTools = allAITools.map(tool => {
-    debug('도구 임베딩 찾기:', tool.id);
-    const toolEmbeddingData = allAIToolEmbeddings.find(emb => emb.id === tool.id);
-    if (!toolEmbeddingData) {
-      debug('도구 임베딩을 찾을 수 없음:', tool.id);
-      return { tool, similarity: 0 };
+  allAITools.forEach(tool => {
+    prompt += `---\nID: ${tool.id}\n이름: ${tool.name}\n설명: ${tool.description}\n특징: ${tool.features.join(', ')}\n사용 사례: ${tool.use_cases.join(', ')}\n카테고리: ${tool.category}\n태그: ${tool.tags.join(', ')}\n---\n`;
+  });
+
+  debug('LLM 프롬프트 생성 완료 (일부):', prompt.slice(0, 500) + '...');
+
+  const llmResponse = await generateCompletion(prompt, 300); // Increased maxTokens for more comprehensive explanation
+  debug('LLM 응답:', llmResponse ? llmResponse.slice(0, 100) + '...' : '없음');
+
+  let explanation = "추천 설명을 생성할 수 없습니다.";
+  let recommendedToolNames: string[] = [];
+  let recommendedToolObjects: AITool[] = [];
+
+  if (llmResponse) {
+    explanation = llmResponse; // Use the entire LLM response as the explanation for now
+
+    // Attempt to extract tool names from the LLM response
+    // A simple approach: look for tool names mentioned directly in the response.
+    for (const tool of allAITools) {
+        if (llmResponse.includes(tool.name)) {
+            recommendedToolNames.push(tool.name);
+        }
     }
-    debug('코사인 유사도 계산 시작');
-    const similarity = cosineSimilarity(userEmbedding, toolEmbeddingData.embedding);
-    debug('코사인 유사도 계산 완료:', tool.id, similarity);
-    return { tool, similarity };
-  });
+    // Filter out duplicates and keep unique names
+    recommendedToolNames = [...new Set(recommendedToolNames)];
 
-  debug('도구 정렬 시작');
-  // Log all scored tools before sorting to see their similarities
-  scoredTools.forEach(item => {
-    debug(`도구: ${item.tool.name} (ID: ${item.tool.id}), 유사도: ${item.similarity.toFixed(4)}`);
-  });
+    // Map identified names back to AITool objects
+    recommendedToolObjects = allAITools.filter(tool => recommendedToolNames.includes(tool.name));
+  }
+  debug('LLM에 의해 추천된 도구 수:', recommendedToolObjects.length);
+  debug('LLM에 의해 생성된 설명 길이:', explanation.length);
 
-  scoredTools.sort((a, b) => b.similarity - a.similarity);
-  debug('도구 정렬 완료.');
-
-  const recommendations = scoredTools.slice(0, topN).map(item => item.tool);
-  debug('추천된 도구 (상위 N개):', recommendations.length);
-  debug('recommendAITools 함수 종료');
-  return recommendations;
+  return { recommendedTools: recommendedToolObjects, explanation: explanation };
 }; 
