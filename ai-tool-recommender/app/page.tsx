@@ -11,51 +11,18 @@ import { Sparkles, Search, Zap, Brain, Loader2, ArrowRight } from "lucide-react"
 import { recommendAITools, loadAIData } from "../lib/recommender";
 import { debug } from "../lib/utils";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
-
-interface AITool {
-  id: string;
-  name: string;
-  description: string;
-  features: string[];
-  use_cases: string[];
-  category: string;
-  tags: string[];
-  url: string;
-  image_url: string;
-  rating: number;
-  reviews: number;
-}
+import { ITool, tools } from "../../shared/types";
 
 export default function AIToolRecommender() {
   console.debug('AIToolRecommender 컴포넌트 시작');
   const [query, setQuery] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [recommendations, setRecommendations] = useState<any[]>([])
-  const [allAITools, setAllAITools] = useState<AITool[]>([]);
+  const [allAITools, setAllAITools] = useState<ITool[]>(tools);
   const [explanation, setExplanation] = useState<string>("");
 
   useEffect(() => {
     console.debug('AIToolRecommender 컴포넌트 마운트됨');
-    console.debug('ai_tools.json 데이터 로드 시작 (모든 AI 도구 표시용)');
-    fetch('/data/ai_tools.json')
-      .then(response => {
-        console.debug('ai_tools.json 응답 수신');
-        if (!response.ok) {
-          throw new Error(`HTTP 오류! 상태: ${response.status}`);
-        }
-        return response.json();
-      })
-      .then((data: AITool[]) => {
-        console.debug('ai_tools.json 데이터 파싱 완료', data.length);
-        console.debug('allAITools 상태 업데이트');
-        setAllAITools(data);
-        console.debug('allAITools 상태 업데이트 완료');
-      })
-      .catch(error => {
-        console.error('ai_tools.json 로드 중 오류 발생:', error);
-        console.debug('ai_tools.json 로드 실패');
-      });
-
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -170,7 +137,7 @@ export default function AIToolRecommender() {
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {recommendations.map((tool, index) => (
+                        {recommendations.map((tool: ITool, index: number) => (
                           <TableRow key={index}>
                             <TableCell className="font-medium">{tool.name}</TableCell>
                             <TableCell>{tool.description}</TableCell>
@@ -199,10 +166,10 @@ export default function AIToolRecommender() {
           {/* All AI Tools Section */}
           <Card className="border-0 shadow-xl bg-white/80 backdrop-blur-sm">
             <CardContent className="p-8">
-              <h3 className="text-xl font-semibold text-slate-700 mb-4">모든 AI 도구 목록</h3>
-              {allAITools.length === 0 && (
-                <p className="text-slate-600">AI 도구를 불러오는 중입니다...</p>
-              )}
+              <h3 className="text-xl font-semibold text-slate-700 mb-4 flex items-center gap-2">
+                <Zap className="w-5 h-5 text-yellow-500" />
+                모든 AI 도구
+              </h3>
               <div className="overflow-x-auto">
                 <Table>
                   <TableHeader>
@@ -215,11 +182,11 @@ export default function AIToolRecommender() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {allAITools.map((tool) => (
-                      <TableRow key={tool.id}>
+                    {allAITools.map((tool: ITool, index: number) => (
+                      <TableRow key={index}>
                         <TableCell className="font-medium">{tool.name}</TableCell>
                         <TableCell>{tool.description}</TableCell>
-                        <TableCell><Badge variant="outline">{tool.category}</Badge></TableCell>
+                        <TableCell><Badge variant="secondary">{tool.category}</Badge></TableCell>
                         <TableCell className="text-center">
                           <div className="flex items-center justify-center text-yellow-400">
                             {"★".repeat(Math.floor(tool.rating))}
@@ -239,11 +206,15 @@ export default function AIToolRecommender() {
             </CardContent>
           </Card>
         </div>
-
-        <footer className="text-center text-slate-500 text-sm mt-12">
-          <p>&copy; {new Date().getFullYear()} AI Tool Recommender. All rights reserved.</p>
-        </footer>
       </div>
+
+      {/* Footer */}
+      <footer className="py-8 bg-slate-800 text-white text-center">
+        <div className="container mx-auto px-4">
+          <p className="text-sm">&copy; {new Date().getFullYear()} AI Tool Recommender. All rights reserved.</p>
+          <p className="text-xs mt-2">Powered by AI</p>
+        </div>
+      </footer>
     </div>
-  );
+  )
 }

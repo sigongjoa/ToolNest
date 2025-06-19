@@ -1,39 +1,19 @@
-import { useQuery } from "@tanstack/react-query";
 import { useParams, Link } from "wouter";
 import { ArrowLeft, Play, Share } from "lucide-react";
-import { type ToolWithReview } from "@shared/schema";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
 import StarRating from "@/components/star-rating";
+import { tools, reviews, ITool, IReview } from "../../../../shared/types";
 
 export default function Review() {
+  console.debug('Review 컴포넌트 시작');
   const { slug } = useParams<{ slug: string }>();
-  
-  const { data: tool, isLoading, error } = useQuery<ToolWithReview>({
-    queryKey: [`/api/tools/${slug}`]
-  });
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-white">
-        <Header />
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="animate-pulse">
-            <div className="h-4 bg-neutral-200 rounded w-24 mb-8"></div>
-            <div className="text-center mb-12">
-              <div className="h-12 bg-neutral-200 rounded w-64 mx-auto mb-4"></div>
-              <div className="h-6 bg-neutral-200 rounded w-32 mx-auto mb-4"></div>
-              <div className="h-4 bg-neutral-200 rounded w-48 mx-auto"></div>
-            </div>
-            <div className="h-48 bg-neutral-200 rounded mb-12"></div>
-          </div>
-        </div>
-        <Footer />
-      </div>
-    );
-  }
+  const tool: ITool | undefined = tools.find(t => t.slug === slug);
+  const review: IReview | undefined = reviews.find(r => r.toolId === Number(tool?.id));
 
-  if (error || !tool || !tool.review) {
+  if (!tool || !review) {
+    console.debug('도구 또는 리뷰를 찾을 수 없음', { slug, tool, review });
     return (
       <div className="min-h-screen bg-white">
         <Header />
@@ -51,8 +31,6 @@ export default function Review() {
       </div>
     );
   }
-
-  const { review } = tool;
 
   return (
     <div className="min-h-screen bg-white">
