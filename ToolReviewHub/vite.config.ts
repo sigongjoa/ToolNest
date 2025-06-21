@@ -3,6 +3,12 @@ import react from "@vitejs/plugin-react";
 import path from "path";
 import runtimeErrorOverlay from "@replit/vite-plugin-runtime-error-modal";
 
+// Define __dirname for ESM context
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
 export default defineConfig({
   plugins: [
     react(),
@@ -14,24 +20,32 @@ export default defineConfig({
             m.cartographer(),
           ),
         ]
-      : []),
+      : []
+    ),
   ],
   resolve: {
     alias: {
-      "@": path.resolve(import.meta.dirname, "client", "src"),
-      "@shared": path.resolve(import.meta.dirname, "shared"),
-      "@assets": path.resolve(import.meta.dirname, "attached_assets"),
+      "@": path.resolve(__dirname, "client", "src"),
+      "@assets": path.resolve(__dirname, "attached_assets"),
     },
   },
-  root: path.resolve(import.meta.dirname, "client"),
+  root: 'client',
   build: {
-    outDir: path.resolve(import.meta.dirname, "dist/public"),
+    outDir: path.resolve(__dirname, "dist", "public"),
     emptyOutDir: true,
   },
   server: {
+    port: 3003,
     fs: {
       strict: true,
       deny: ["**/.*"],
+      allow: [path.resolve(__dirname, "client", "src"), path.resolve(__dirname, "client")],
     },
+    proxy: {
+      '/api': 'http://localhost:5000', // Proxy /api requests to Express server
+    },
+  },
+  optimizeDeps: {
+    exclude: ['@tanstack/react-query-devtools'],
   },
 });

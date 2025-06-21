@@ -1,38 +1,40 @@
-import { Switch, Route } from "wouter";
-import { queryClient } from "./lib/queryClient";
-import { QueryClientProvider } from "@tanstack/react-query";
-import { Toaster } from "@/components/ui/toaster";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import Home from "@/pages/home";
-import Review from "@/pages/review";
-import NotFound from "@/pages/not-found";
-import AiSites from "@/pages/AiSites";
-import UsefulSites from "@/pages/UsefulSites";
-import OfficeWorkerAiSites from "@/pages/OfficeWorkerAiSites";
-import StudentAiSites from "@/pages/StudentAiSites";
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import ToolsList from './pages/ToolsList';
+import ToolDetail from './pages/ToolDetail';
+import NotFound from './pages/not-found';
+import { WeightsProvider } from './context/WeightsContext';
+import { ThemeProvider } from './components/theme-provider';
+import { Toaster } from './components/ui/toaster';
+import Header from './components/header';
+import Footer from './components/footer';
 
-function Router() {
-  console.debug('Router 컴포넌트 시작');
-  return (
-    <Switch>
-      <Route path="/" component={Home} />
-      <Route path="/ai-sites" component={AiSites} />
-      <Route path="/useful-sites" component={UsefulSites} />
-      <Route path="/officeworker-ai-sites" component={OfficeWorkerAiSites} />
-      <Route path="/student-ai-sites" component={StudentAiSites} />
-      <Route path="/reviews/:slug" component={Review} />
-      <Route component={NotFound} />
-    </Switch>
-  );
-}
+const queryClient = new QueryClient();
 
 function App() {
+  console.debug('App: Rendering application.');
   return (
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <Router />
-      </TooltipProvider>
+      <WeightsProvider>
+        <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+          <Router>
+            <Header />
+            <main className="flex-grow">
+              <Routes>
+                <Route path="/" element={<ToolsList />} />
+                <Route path="/tools" element={<ToolsList />} />
+                <Route path="/tools/:slug" element={<ToolDetail />} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </main>
+            <Footer />
+          </Router>
+          <Toaster />
+        </ThemeProvider>
+      </WeightsProvider>
+      <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
   );
 }

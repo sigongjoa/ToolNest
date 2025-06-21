@@ -1,5 +1,5 @@
 export interface ITool {
-  id: string;
+  id: number;
   name: string;
   slug: string;
   category: string;
@@ -7,6 +7,24 @@ export interface ITool {
   rating: number;
   imageUrl: string;
   url: string;
+  metrics?: Metric;
+  categories: string[];
+}
+
+export interface Metric {
+  accuracy: number;
+  latency: number;
+  cost: number;
+  usability: number;
+  stability: number;
+}
+
+export interface Weights {
+  accuracy: number;
+  latency: number;
+  cost: number;
+  usability: number;
+  stability: number;
 }
 
 export interface IReview {
@@ -21,114 +39,125 @@ export interface IReview {
 
 export const tools: ITool[] = [
   {
-    id: "5",
+    id: 5,
     name: "Anthropic Claude 3",
     slug: "claude-3",
     category: "AI",
     description: "Anthropic에서 제공하는 대화형 AI로, 높은 안전성(safety)과 일관된 응답 품질을 자랑합니다.",
     rating: 4.8,
     imageUrl: "https://example.com/logos/claude3.png",
-    url: "https://www.anthropic.com/claude"
+    url: "https://www.anthropic.com/claude",
+    categories: ["AI"]
   },
   {
-    id: "6",
+    id: 6,
     name: "GitHub Copilot",
     slug: "github-copilot",
     category: "AI",
     description: "GitHub와 OpenAI가 협업하여 만든 AI 코딩 도우미로, IDE 내에서 실시간 코드 제안과 완성을 지원합니다.",
     rating: 4.6,
     imageUrl: "https://example.com/logos/copilot.png",
-    url: "https://github.com/features/copilot"
+    url: "https://github.com/features/copilot",
+    categories: ["AI"]
   },
   {
-    id: "7",
+    id: 7,
     name: "Jasper AI",
     slug: "jasper-ai",
     category: "AI",
     description: "마케팅 카피, 블로그 포스트, 광고 문구 등을 자동 생성해 주는 AI 콘텐츠 플랫폼입니다.",
     rating: 4.5,
     imageUrl: "https://example.com/logos/jasper.png",
-    url: "https://www.jasper.ai"
+    url: "https://www.jasper.ai",
+    categories: ["AI"]
   },
   {
-    id: "8",
+    id: 8,
     name: "Copy.ai",
     slug: "copy-ai",
     category: "AI",
     description: "간단한 프롬프트만으로 소셜 미디어 캡션, 이메일, 블로그 초안을 빠르게 만들어 주는 도구입니다.",
     rating: 4.3,
     imageUrl: "https://example.com/logos/copyai.png",
-    url: "https://www.copy.ai"
+    url: "https://www.copy.ai",
+    categories: ["AI"]
   },
   {
-    id: "9",
+    id: 9,
     name: "Stable Diffusion",
     slug: "stable-diffusion",
     category: "AI",
     description: "오픈소스 텍스트→이미지 생성 모델로, 로컬 설치 후 커스터마이징이 자유롭습니다.",
     rating: 4.4,
     imageUrl: "https://example.com/logos/stable-diffusion.png",
-    url: "https://stability.ai/blog/stable-diffusion"
+    url: "https://stability.ai/blog/stable-diffusion",
+    categories: ["AI"]
   },
   {
-    id: "10",
+    id: 10,
     name: "Google Drive",
     slug: "google-drive",
     category: "General Utility",
     description: "문서, 사진, 비디오 등을 저장하고 공유할 수 있는 클라우드 저장 서비스입니다.",
     rating: 4.7,
     imageUrl: "https://example.com/logos/google-drive.png",
-    url: "https://drive.google.com/"
+    url: "https://drive.google.com/",
+    categories: ["General Utility"]
   },
   {
-    id: "11",
+    id: 11,
     name: "Notion",
     slug: "notion",
     category: "Productivity Tool",
     description: "메모, 프로젝트 관리, 데이터베이스 등 다양한 기능을 통합하여 제공하는 워크스페이스 도구입니다.",
     rating: 4.6,
     imageUrl: "https://example.com/logos/notion.png",
-    url: "https://www.notion.so/"
+    url: "https://www.notion.so/",
+    categories: ["Productivity Tool"]
   },
   {
-    id: "12",
+    id: 12,
     name: "Zoom",
     slug: "zoom",
     category: "Business AI",
     description: "원격 회의, 웨비나, 채팅 등 다양한 협업 기능을 제공하는 화상 회의 플랫폼입니다.",
     rating: 4.5,
     imageUrl: "https://example.com/logos/zoom.png",
-    url: "https://zoom.us/"
+    url: "https://zoom.us/",
+    categories: ["Business AI"]
   },
   {
-    id: "13",
+    id: 13,
     name: "Slack",
     slug: "slack",
     category: "Business AI",
     description: "팀 커뮤니케이션 및 협업을 위한 메시징 플랫폼입니다.",
     rating: 4.4,
     imageUrl: "https://example.com/logos/slack.png",
-    url: "https://slack.com/"
+    url: "https://slack.com/",
+    categories: ["Business AI"]
   },
   {
-    id: "14",
+    id: 14,
     name: "Quizlet",
     slug: "quizlet",
     category: "Education AI",
     description: "플래시카드, 퀴즈, 게임 등을 통해 학습을 돕는 온라인 학습 도구입니다.",
     rating: 4.3,
     imageUrl: "https://example.com/logos/quizlet.png",
-    url: "https://quizlet.com/"
+    url: "https://quizlet.com/",
+    categories: ["Education AI"]
   },
   {
-    id: "15",
+    id: 15,
     name: "Grammarly",
     slug: "grammarly",
     category: "Education AI",
     description: "문법, 철자, 구두점 오류를 교정하고 문체 개선을 돕는 글쓰기 도우미입니다.",
     rating: 4.6,
     imageUrl: "https://example.com/logos/grammarly.png",
-    url: "https://www.grammarly.com/"
+    url: "https://www.grammarly.com/",
+    categories: ["Education AI"]
   }
 ];
 

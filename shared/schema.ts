@@ -1,7 +1,7 @@
 import { pgTable, text, serial, integer, real } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
-import { ITool, IReview } from "../client/src/lib/types";
+import { ITool, IReview } from "../ToolReviewHub/client/src/lib/types";
 
 export const tools = pgTable("tools", {
   id: serial("id").primaryKey(),
@@ -39,4 +39,4 @@ export type Review = IReview;
 
 export type ToolWithReview = Tool & {
   review?: Review;
-}; 
+};

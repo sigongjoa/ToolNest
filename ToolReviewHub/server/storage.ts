@@ -1,4 +1,95 @@
-import { tools, reviews, type Tool, type Review, type InsertTool, type InsertReview, type ToolWithReview } from "@shared/schema";
+import { tools, reviews, type Tool, type Review, type InsertTool, type InsertReview, type ToolWithReview } from "../shared/schema";
+
+const seedTools: InsertTool[] = [
+  {
+    name: "Midjourney",
+    slug: "midjourney",
+    category: "Image Generation",
+    description: "텍스트 프롬프트만으로 고퀄리티 이미지를 생성해 주는 AI 서비스입니다.",
+    rating: 4.8,
+    imageUrl: "https://example.com/logos/midjourney.png",
+    url: "https://www.midjourney.com",
+  },
+  {
+    name: "ChatGPT",
+    slug: "chatgpt",
+    category: "NLP",
+    description: "대화형 AI로, 다양한 주제에 대해 자연스러운 응답과 콘텐츠 생성을 지원합니다.",
+    rating: 4.7,
+    imageUrl: "https://example.com/logos/chatgpt.png",
+    url: "https://chat.openai.com",
+  },
+  {
+    name: "GitHub Copilot",
+    slug: "github-copilot",
+    category: "Code Assistant",
+    description: "IDE 내에서 실시간 코드 완성·제안을 제공하는 AI 코딩 도우미입니다.",
+    rating: 4.6,
+    imageUrl: "https://example.com/logos/copilot.png",
+    url: "https://github.com/features/copilot",
+  },
+  {
+    name: "Grammarly",
+    slug: "grammarly",
+    category: "Writing Aid",
+    description: "문법·맞춤법은 물론 스타일 개선까지 도와주는 글쓰기 보조 도구입니다.",
+    rating: 4.5,
+    imageUrl: "https://example.com/logos/grammarly.png",
+    url: "https://www.grammarly.com",
+  },
+  {
+    name: "Stable Diffusion",
+    slug: "stable-diffusion",
+    category: "Image Generation",
+    description: "로컬 GPU에서도 실행 가능한 오픈소스 텍스트→이미지 생성 모델입니다.",
+    rating: 4.4,
+    imageUrl: "https://example.com/logos/stable-diffusion.png",
+    url: "https://stability.ai/blog/stable-diffusion",
+  },
+];
+
+const seedReviews: InsertReview[] = [
+  {
+    toolId: 1,
+    subtitle: "환상적인 이미지 퀄리티",
+    content: "Midjourney의 결과물은 디테일과 색감이 정말 뛰어나서, 아트워크 제작에 최적입니다.",
+    pros: ["다양한 스타일 지원", "높은 해상도 결과물", "빠른 응답 속도"],
+    cons: ["무료 체험 제한이 큼", "상업용 라이선스 비용 높음"],
+    screenshots: ["https://example.com/screenshots/midjourney1.png"],
+  },
+  {
+    toolId: 2,
+    subtitle: "자연스러운 대화와 높은 활용도",
+    content: "ChatGPT는 질문·답변뿐 아니라 블로그 초안, 코드 생성 등 다방면으로 활용 가능합니다.",
+    pros: ["긴 컨텍스트 유지", "플러그인 확장성", "다국어 지원"],
+    cons: ["때때로 사실관계 오류", "프라이버시 우려"],
+    screenshots: ["https://example.com/screenshots/chatgpt_discuss.png"],
+  },
+  {
+    toolId: 3,
+    subtitle: "개발 생산성 극대화",
+    content: "Copilot은 복잡한 함수도 단 몇 초 만에 제안해 줘서, 코드 작성 속도가 크게 빨라졌습니다.",
+    pros: ["다양한 언어 지원", "IDE 통합 매끄러움", "코드 컨텍스트 이해도 우수"],
+    cons: ["민감정보 제안 위험", "가끔 부적절한 코드 생성"],
+    screenshots: ["https://example.com/screenshots/copilot_suggestion.png"],
+  },
+  {
+    toolId: 4,
+    subtitle: "글쓰기 완성도 UP",
+    content: "Grammarly는 기본 문법 교정에서 스타일 제안까지 제공해, 보고서나 이메일 작성 시 유용합니다.",
+    pros: ["실시간 교정", "스타일 토글 기능", "브라우저 확장 지원"],
+    cons: ["무료 버전 기능 제한", "한국어 지원 미흡"],
+    screenshots: ["https://example.com/screenshots/grammarly_ui.png"],
+  },
+  {
+    toolId: 5,
+    subtitle: "자유도 높은 이미지 생성",
+    content: "Stable Diffusion은 커스터마이징과 오프라인 실행이 가능해, 프라이빗 프로젝트에 적합합니다.",
+    pros: ["오픈소스·무료", "로컬 실행 가능", "플러그인 생태계 풍부"],
+    cons: ["설치 환경 구성 복잡", "GPU 메모리 의존도 높음"],
+    screenshots: ["https://example.com/screenshots/stable_diffusion_run.png"],
+  },
+];
 
 export interface IStorage {
   getTools(): Promise<Tool[]>;
@@ -24,126 +115,21 @@ export class MemStorage implements IStorage {
   }
 
   private initializeData() {
-    // Visual Studio Code
-    const vscode: Tool = {
-      id: this.currentToolId++,
-      name: "Visual Studio Code",
-      slug: "visual-studio-code",
-      category: "Code Editor",
-      description: "A powerful, lightweight code editor with extensive extension support and integrated development features.",
-      rating: 5.0,
-      imageUrl: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?ixlib=rb-4.0.3&auto=format&fit=crop&w=80&h=80"
-    };
-    this.tools.set(vscode.id, vscode);
+    console.debug('MemStorage: Initializing data with seedTools and seedReviews.');
+    seedTools.forEach(async (seedTool, index) => {
+      console.debug(`MemStorage: Adding tool ${seedTool.name} (index: ${index}).`);
+      const tool = await this.createTool(seedTool);
+      console.debug(`MemStorage: Added tool with ID: ${tool.id}.`);
+    });
 
-    const vscodeReview: Review = {
-      id: this.currentReviewId++,
-      toolId: vscode.id,
-      subtitle: "The definitive code editor for modern development",
-      content: "Visual Studio Code has revolutionized the way developers approach coding with its perfect balance of simplicity and power. As a free, open-source editor developed by Microsoft, VS Code has become the go-to choice for millions of developers worldwide. Its lightweight architecture doesn't compromise on functionality, offering an extensive marketplace of extensions that can transform it into a full-featured IDE for any programming language or framework. The integrated terminal, debugging capabilities, and Git integration make it a comprehensive development environment. What sets VS Code apart is its incredible customization options, allowing developers to tailor every aspect of their coding experience. The IntelliSense feature provides smart code completion, while the built-in support for multiple languages and frameworks makes it versatile enough for any project. Regular updates and an active community ensure that VS Code stays current with the latest development trends and technologies.",
-      pros: [
-        "Completely free and open-source",
-        "Extensive extension marketplace with thousands of plugins",
-        "Lightweight and fast performance",
-        "Excellent Git integration and version control",
-        "Cross-platform support (Windows, macOS, Linux)",
-        "Regular updates and active development"
-      ],
-      cons: [
-        "Can become resource-heavy with many extensions",
-        "Limited built-in refactoring tools compared to full IDEs",
-        "Requires configuration for optimal language-specific features",
-        "Some enterprise features require additional setup"
-      ],
-      screenshots: [
-        "https://images.unsplash.com/photo-1555066931-4365d14bab8c?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&h=300",
-        "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&h=300",
-        "https://images.unsplash.com/photo-1629654297299-c8506221ca97?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&h=300",
-        "https://images.unsplash.com/photo-1556075798-4825dfaaf498?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&h=300",
-        "https://images.unsplash.com/photo-1574169208507-84376144848b?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&h=300",
-        "https://images.unsplash.com/photo-1509966756634-9c23dd6e6815?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&h=300"
-      ]
-    };
-    this.reviews.set(vscodeReview.id, vscodeReview);
-
-    // Figma
-    const figma: Tool = {
-      id: this.currentToolId++,
-      name: "Figma",
-      slug: "figma",
-      category: "Design Tool",
-      description: "Collaborative design platform that revolutionizes team workflows with real-time collaboration and prototyping.",
-      rating: 4.2,
-      imageUrl: "https://images.unsplash.com/photo-1581291518857-4e27b48ff24e?ixlib=rb-4.0.3&auto=format&fit=crop&w=80&h=80"
-    };
-    this.tools.set(figma.id, figma);
-
-    const figmaReview: Review = {
-      id: this.currentReviewId++,
-      toolId: figma.id,
-      subtitle: "Collaborative design that transforms team workflows",
-      content: "Figma has fundamentally changed how design teams collaborate and create digital products. As a browser-based design tool, it eliminates the traditional barriers of software installation and version control that plague other design platforms. The real-time collaboration feature allows multiple team members to work simultaneously on the same project, making it feel more like Google Docs for designers. Its component system and design tokens create consistency across large projects, while the auto-layout feature saves countless hours in responsive design creation. The prototyping capabilities are robust enough for complex interactions, and the developer handoff process is seamless with generated code snippets and design specifications. Figma's plugin ecosystem extends functionality significantly, and the community resources are invaluable for design teams. The web-based nature means it works equally well on any operating system, making it ideal for distributed teams. However, it does require a stable internet connection and can be resource-intensive on older machines when working with complex designs.",
-      pros: [
-        "Real-time collaboration with team members",
-        "Browser-based with no installation required",
-        "Powerful component system and design tokens",
-        "Excellent developer handoff with code generation",
-        "Cross-platform compatibility"
-      ],
-      cons: [
-        "Requires stable internet connection",
-        "Can be resource-intensive on older machines",
-        "Limited advanced typography features",
-        "Subscription pricing can be expensive for large teams"
-      ],
-      screenshots: [
-        "https://images.unsplash.com/photo-1581291518857-4e27b48ff24e?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&h=300",
-        "https://images.unsplash.com/photo-1560472354-b33ff0c44a43?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&h=300",
-        "https://images.unsplash.com/photo-1611224923853-80b023f02d71?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&h=300",
-        "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&h=300"
-      ]
-    };
-    this.reviews.set(figmaReview.id, figmaReview);
-
-    // Notion
-    const notion: Tool = {
-      id: this.currentToolId++,
-      name: "Notion",
-      slug: "notion",
-      category: "Productivity",
-      description: "All-in-one workspace that combines notes, docs, wikis, and project management in one flexible platform.",
-      rating: 4.4,
-      imageUrl: "https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?ixlib=rb-4.0.3&auto=format&fit=crop&w=80&h=80"
-    };
-    this.tools.set(notion.id, notion);
-
-    const notionReview: Review = {
-      id: this.currentReviewId++,
-      toolId: notion.id,
-      subtitle: "The ultimate all-in-one workspace solution",
-      content: "Notion has redefined what a productivity workspace can be by seamlessly combining notes, databases, wikis, and project management into a single, infinitely customizable platform. Its block-based editor allows users to create complex documents that can include text, images, tables, kanban boards, calendars, and more, all within the same interface. The template system accelerates setup for common use cases, while the database functionality rivals dedicated tools like Airtable. Notion's flexibility is both its greatest strength and potential weakness - while power users can create incredibly sophisticated workflows, newcomers might feel overwhelmed by the possibilities. The collaboration features enable teams to maintain shared knowledge bases and project documentation effectively. Recent performance improvements have addressed earlier speed concerns, though it can still feel slower than specialized tools. The mobile apps have improved significantly, making it viable for on-the-go productivity. For teams looking to consolidate multiple tools into one platform, Notion presents a compelling option.",
-      pros: [
-        "Incredibly flexible and customizable workspace",
-        "Combines multiple productivity tools in one platform",
-        "Powerful database and template system",
-        "Strong collaboration and sharing features",
-        "Regular feature updates and improvements",
-        "Extensive integration capabilities"
-      ],
-      cons: [
-        "Steep learning curve for advanced features",
-        "Can be slower than specialized tools",
-        "Limited offline functionality",
-        "Pricing can escalate quickly for larger teams"
-      ],
-      screenshots: [
-        "https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&h=300",
-        "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&h=300",
-        "https://images.unsplash.com/photo-1586281380349-632531db7ed4?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&h=300",
-        "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&h=300"
-      ]
-    };
-    this.reviews.set(notionReview.id, notionReview);
+    // Reviews need to be added after tools are created and their IDs are known.
+    // Since toolId in seedReviews are hardcoded based on sequential IDs, we can use that for this in-memory storage.
+    seedReviews.forEach(async (seedReview, index) => {
+      console.debug(`MemStorage: Adding review for tool ID ${seedReview.toolId} (index: ${index}).`);
+      const review = await this.createReview(seedReview);
+      console.debug(`MemStorage: Added review with ID: ${review.id}.`);
+    });
+    console.debug('MemStorage: Data initialization complete.');
   }
 
   async getTools(): Promise<Tool[]> {

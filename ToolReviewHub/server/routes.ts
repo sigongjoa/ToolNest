@@ -7,6 +7,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/tools", async (req, res) => {
     try {
       const tools = await storage.getTools();
+      console.log('Server: Sending tools data to client:', tools);
       res.json(tools);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch tools" });
