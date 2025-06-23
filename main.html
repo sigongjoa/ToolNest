@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 블랙 가이드 - AI 쌀먹지수</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #f5f3ff;
+        }
+        .main-gradient {
+            background: linear-gradient(180deg, #f5f3ff 0%, #ede9fe 100%);
+        }
+        .card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid #e5e7eb;
+        }
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+        }
+        .category-tab-active {
+            background-color: #4f46e5;
+            color: white;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+        .category-tab-inactive {
+            background-color: white;
+            color: #4b5563;
+        }
+        .nav-tab-active {
+            color: #4f46e5; /* indigo-600 */
+            font-weight: 700;
+            border-bottom: 2px solid #4f46e5;
+        }
+        .star-rating, .favorite-btn.active {
+            color: #f59e0b; /* amber-500 */
+        }
+        .favorite-btn {
+            color: #d1d5db; /* gray-300 */
+            transition: color 0.2s;
+        }
+        .favorite-btn:hover {
+            color: #fcd34d; /* amber-300 */
+        }
+        .winner-border { border: 2px solid #4f46e5; }
+        .winner-badge { transform: rotate(15deg) translate(20px, -20px); }
+        .policy-content h2 { font-size: 1.5rem; font-weight: 700; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid #e5e7eb; }
+        .policy-content h3 { font-size: 1.25rem; font-weight: 600; margin-top: 1.5rem; margin-bottom: 0.75rem; }
+        .policy-content p, .policy-content li { color: #4b5563; line-height: 1.75; }
+        .policy-content ul { list-style-type: disc; padding-left: 1.5rem; margin-bottom: 1rem; }
+        .pricing-card { border: 1px solid #e5e7eb; }
+        .pricing-card.featured { border-color: #4f46e5; border-width: 2px; }
+        .loader { border: 4px solid #f3f3f3; border-top: 4px solid #4f46e5; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body class="text-gray-800 flex flex-col min-h-screen">
+
+    <header class="w-full bg-white/80 backdrop-blur-sm shadow-sm sticky top-0 z-50">
+        <nav class="container mx-auto px-6 flex justify-between items-center h-20">
+            <a href="#" data-tab-link="reviews" class="flex items-center space-x-2 footer-link">
+                <span class="inline-block w-8 h-8 bg-indigo-600 rounded-lg"></span>
+                <span class="text-xl font-bold text-gray-900">AI 블랙 가이드</span>
+            </a>
+            <div id="main-nav" class="hidden md:flex items-center space-x-6 h-full">
+                <a href="#" data-tab="reviews" class="nav-tab nav-tab-active h-full flex items-center text-gray-600 hover:text-indigo-600 font-medium transition-colors">AI 쌀먹지수</a>
+                <a href="#" data-tab="comparison" class="nav-tab h-full flex items-center text-gray-600 hover:text-indigo-600 font-medium transition-colors">도구 비교</a>
+                <a href="#" data-tab="hogaeng-prevention" class="nav-tab h-full flex items-center text-gray-600 hover:text-indigo-600 font-medium transition-colors">AI 호갱방지</a>
+                <a href="#" data-tab="premium" class="nav-tab h-full flex items-center text-gray-600 hover:text-indigo-600 font-medium transition-colors">프리미엄</a>
+                <a href="#" data-tab="index-info" class="nav-tab h-full flex items-center text-gray-600 hover:text-indigo-600 font-medium transition-colors">쌀먹지수란?</a>
+                <a href="#" data-tab="about" class="nav-tab h-full flex items-center text-gray-600 hover:text-indigo-600 font-medium transition-colors">About</a>
+            </div>
+             <button id="mobile-menu-button" class="md:hidden flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" /></svg>
+            </button>
+        </nav>
+    </header>
+
+    <div class="main-gradient flex-grow">
+        <main class="container mx-auto px-6 pt-12 pb-24">
+            
+            <!-- Content Panel: Reviews -->
+            <div id="reviews-content" class="tab-content">
+                 <section class="text-center mb-16">
+                    <h1 class="text-4xl md:text-5xl font-black mb-4 text-gray-900 tracking-tight">AI 쌀먹지수 랭킹</h1>
+                    <p class="text-lg text-gray-600 max-w-2xl mx-auto">돈과 시간을 아껴주는 AI 툴을 쌀먹지수 순위로 확인하세요.</p>
+                </section>
+                <section class="mb-12 max-w-2xl mx-auto">
+                    <form id="search-form" class="relative">
+                        <input type="search" id="search-input" placeholder="궁금한 AI 기능을 대화하듯 물어보세요..." class="w-full p-4 pl-12 text-lg border-2 border-gray-200 rounded-full focus:ring-indigo-500 focus:border-indigo-500">
+                        <div class="absolute inset-y-0 left-0 flex items-center pl-4"><svg class="h-6 w-6 text-gray-400" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M8 1.532a6.468 6.468 0 0 0-6.468 6.468A6.468 6.468 0 0 0 8 14.468a6.468 6.468 0 0 0 6.468-6.468A6.468 6.468 0 0 0 8 1.532zM7.218 4.468a.75.75 0 1 1 1.5 0v.01a.75.75 0 1 1-1.5 0v-.01zM8 6.718a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5zm-2.262 4.01a.75.75 0 1 1 1.06 1.06l-1.06-1.06z"/></svg></div>
+                         <button type="submit" class="absolute inset-y-0 right-0 flex items-center pr-4 font-semibold text-indigo-600">검색</button>
+                    </form>
+                </section>
+                <section id="category" class="mb-12">
+                    <div class="flex flex-wrap justify-center gap-3 md:gap-4" id="category-tabs">
+                        <button data-category="all" class="category-tab category-tab-active flex items-center gap-2 px-4 py-2 text-sm md:text-base font-semibold rounded-full transition-all duration-300">전체</button>
+                        <button data-category="developer" class="category-tab category-tab-inactive flex items-center gap-2 px-4 py-2 text-sm md:text-base font-semibold rounded-full transition-all duration-300">개발자</button>
+                        <button data-category="ai-tool" class="category-tab category-tab-inactive flex items-center gap-2 px-4 py-2 text-sm md:text-base font-semibold rounded-full transition-all duration-300">AI</button>
+                        <button data-category="student" class="category-tab category-tab-inactive flex items-center gap-2 px-4 py-2 text-sm md:text-base font-semibold rounded-full transition-all duration-300">학생</button>
+                        <button data-category="website" class="category-tab category-tab-inactive flex items-center gap-2 px-4 py-2 text-sm md:text-base font-semibold rounded-full transition-all duration-300">유용한 웹사이트</button>
+                        <button data-category="favorites" class="category-tab category-tab-inactive flex items-center gap-2 px-4 py-2 text-sm md:text-base font-semibold rounded-full transition-all duration-300">⭐ 즐겨찾기</button>
+                    </div>
+                </section>
+                <section id="reviews">
+                    <div id="review-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
+                    <div id="loading-indicator" class="text-center text-gray-500 py-16 hidden"><div class="loader mx-auto mb-4"></div><p class="text-xl">AI가 열심히 생각 중입니다...</p></div>
+                    <div id="no-results" class="text-center text-gray-500 py-16 hidden"><p class="text-2xl mb-2">🤔</p><p class="text-xl">검색 결과가 없습니다.</p></div>
+                </section>
+            </div>
+            
+            <!-- Content Panel: Comparison -->
+            <div id="comparison-content" class="tab-content hidden">
+                 <section id="comparison">
+                    <div class="text-center mb-16"><h1 class="text-4xl md:text-5xl font-black mb-4 text-gray-900 tracking-tight">AI 도구 맞대결</h1><p class="text-lg text-gray-600 max-w-3xl mx-auto">어떤 도구가 당신에게 더 적합할까요? 주요 AI 서비스들을 직접 비교 분석해 드립니다.</p></div>
+                    <div id="comparison-grid" class="grid md:grid-cols-2 gap-8 mb-20"></div>
+                    <div id="comparison-verdict" class="bg-white rounded-2xl shadow-xl p-8 max-w-4xl mx-auto hidden">
+                        <h2 class="text-3xl font-bold text-gray-900 mb-4 text-center" id="verdict-headline"></h2>
+                        <p class="text-gray-700 leading-relaxed" id="verdict-body"></p>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Content Panel: Hogaeng Prevention Guide -->
+            <div id="hogaeng-prevention-content" class="tab-content hidden">
+                 <section id="paid-plan-analysis">
+                    <div class="text-center mb-16"><h1 class="text-4xl md:text-5xl font-black mb-4 text-gray-900 tracking-tight">AI 호갱방지 가이드</h1><p class="text-lg text-gray-600 max-w-3xl mx-auto">"이거 구독하면 호갱되는 거 아냐?" 당신의 소중한 월급을 지켜드리기 위해, 화제의 AI 유료 플랜을 대신 써보고 본전 뽑는지 알려드립니다.</p></div>
+                    <div id="hogaeng-grid" class="space-y-12"></div>
+                 </section>
+            </div>
+
+            <!-- Content Panel: Premium -->
+            <div id="premium-content" class="tab-content hidden">
+                 <section id="premium-plans">
+                    <div class="text-center mb-16"><h1 class="text-4xl md:text-5xl font-black mb-4 text-gray-900 tracking-tight">프리미엄 구독 플랜</h1><p class="text-lg text-gray-600 max-w-3xl mx-auto">AI를 제대로 활용하고 싶은 분들을 위한 최고의 선택. 광고 없이, 더 깊이 있는 정보와 전문가의 컨설팅을 경험하세요.</p></div>
+                    <div class="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto mb-20">
+                        <div class="pricing-card bg-white rounded-xl p-8"><h3 class="text-2xl font-bold text-gray-900">FREE</h3><p class="text-gray-500 mt-2">AI 툴 기본 정보 탐색</p><p class="text-4xl font-extrabold my-6">₩0</p><ul class="space-y-3 text-gray-700"><li class="flex items-center"><span class="mr-3 text-green-500">✔</span>모든 AI 쌀먹지수 리뷰 열람</li><li class="flex items-center"><span class="mr-3 text-green-500">✔</span>AI 호갱방지 가이드 열람</li><li class="flex items-center"><span class="mr-3 text-red-500">✖</span>AI 컨설턴트 검색 (제한적)</li><li class="flex items-center"><span class="mr-3 text-red-500">✖</span>구독자 전용 디스코드 참여 불가</li><li class="flex items-center"><span class="mr-3 text-red-500">✖</span>광고 없는 쾌적한 환경</li></ul></div>
+                        <div class="pricing-card featured bg-white rounded-xl p-8 relative"><div class="absolute top-0 -mt-4 left-1/2 -translate-x-1/2"><span class="bg-indigo-600 text-white font-semibold px-4 py-1 rounded-full text-sm">BEST PLAN</span></div><h3 class="text-2xl font-bold text-indigo-600">PRO</h3><p class="text-gray-500 mt-2">AI 전문가의 모든 노하우</p><p class="text-4xl font-extrabold my-6">₩9,900<span class="text-base font-medium text-gray-500">/월</span></p><ul class="space-y-3 text-gray-700"><li class="flex items-center"><span class="mr-3 text-green-500">✔</span>모든 AI 쌀먹지수 리뷰 열람</li><li class="flex items-center"><span class="mr-3 text-green-500">✔</span>AI 호갱방지 가이드 열람</li><li class="flex items-center"><span class="mr-3 text-green-500">✔</span><strong class="text-indigo-600">AI 컨설턴트 검색 (무제한)</strong></li><li class="flex items-center"><span class="mr-3 text-green-500">✔</span><strong class="text-indigo-600">구독자 전용 디스코드 참여</strong></li><li class="flex items-center"><span class="mr-3 text-green-500">✔</span><strong class="text-indigo-600">광고 없는 쾌적한 환경</strong></li></ul><button class="w-full mt-8 bg-indigo-600 text-white font-bold py-3 rounded-lg hover:bg-indigo-700 transition-colors">PRO 플랜 구독하기</button></div>
+                    </div>
+                    <div class="text-center my-24 border-t-2 border-dashed border-gray-300"></div>
+                    <div class="grid md:grid-cols-2 gap-12 items-center max-w-5xl mx-auto">
+                        <div><h2 class="text-3xl font-bold text-gray-900">구독자 전용 디스코드 커뮤니티</h2><p class="mt-4 text-gray-600 leading-relaxed">단순 정보 공유를 넘어, 실제 프로젝트에 AI를 적용하며 겪는 어려움을 해결하는 전문가 커뮤니티입니다. PRO 구독자가 되어 AI 전문가에게 직접 질문하고, 다른 실무자들과 인사이트를 나누세요.</p><ul class="mt-6 space-y-3"><li class="flex items-start"><span class="flex-shrink-0 mr-3 mt-1 w-5 h-5 bg-indigo-100 text-indigo-600 flex items-center justify-center rounded-full font-bold">1</span><div><strong>전문가 1:1 Q&A:</strong> "제 상황에 딱 맞는 AI 툴 조합은 뭘까요?"와 같은 개인화된 질문에 운영자가 직접 답변해 드립니다.</div></li><li class="flex items-start"><span class="flex-shrink-0 mr-3 mt-1 w-5 h-5 bg-indigo-100 text-indigo-600 flex items-center justify-center rounded-full font-bold">2</span><div><strong>비공개 정보 및 팁 공유:</strong> 웹사이트에 공개되지 않는 최신 AI 소식과 실무 팁을 가장 먼저 받아보세요.</div></li><li class="flex items-start"><span class="flex-shrink-0 mr-3 mt-1 w-5 h-5 bg-indigo-100 text-indigo-600 flex items-center justify-center rounded-full font-bold">3</span><div><strong>네트워킹:</strong> 다양한 분야의 실무자들과 교류하며 새로운 기회를 만들어 보세요.</div></li></ul><button class="mt-8 bg-gray-800 text-white font-bold py-3 px-6 rounded-lg hover:bg-black transition-colors">디스코드 참여하기 (PRO 구독자)</button></div>
+                         <div class="text-center"><img src="https://placehold.co/500x400/1e293b/ffffff?text=Discord+Community" alt="디스코드 커뮤니티 예시 이미지" class="rounded-xl shadow-lg"></div>
+                    </div>
+                 </section>
+            </div>
+
+            <!-- Content Panel: Index Info -->
+            <div id="index-info-content" class="tab-content hidden">
+                 <section class="text-center mb-16"><h1 class="text-4xl md:text-5xl font-black mb-4 text-gray-900 tracking-tight">쌀먹지수란?</h1><p class="text-lg text-gray-600 max-w-2xl mx-auto">'AI 블랙 가이드'만의 객관적이고 실용적인 AI 도구 평가 기준입니다.</p></section>
+                <div class="max-w-4xl mx-auto bg-white p-8 rounded-xl shadow-md"><h2 class="text-2xl font-bold mb-4">"그래서 이걸로 쌀먹이 가능한가?"</h2><p class="mb-6 text-gray-700">이 질문에 답하기 위해 'AI 쌀먹지수'는 탄생했습니다. 저희는 단순히 기능 나열에 그치지 않고, 다음과 같은 핵심 기준들을 종합적으로 평가하여 점수를 매깁니다.</p><ul class="space-y-4"><li class="flex items-start"><div class="flex-shrink-0 w-8 h-8 bg-indigo-100 text-indigo-600 flex items-center justify-center rounded-full font-bold mr-4">1</div><div><strong class="block">실제 생산성 향상 (40%)</strong>: 이 도구가 정말 내 업무/학습 시간을 줄여주는가? 투자 대비 효용(ROI)이 확실한가?</div></li><li class="flex items-start"><div class="flex-shrink-0 w-8 h-8 bg-indigo-100 text-indigo-600 flex items-center justify-center rounded-full font-bold mr-4">2</div><div><strong class="block">사용 편의성 (30%)</strong>: 배우기 쉽고 사용하기 편리한가? 직관적인 UI/UX를 제공하는가?</div></li><li class="flex items-start"><div class="flex-shrink-0 w-8 h-8 bg-indigo-100 text-indigo-600 flex items-center justify-center rounded-full font-bold mr-4">3</div><div><strong class="block">결과물 품질 (20%)</strong>: 생성된 결과물(코드, 글, 이미지 등)의 퀄리티가 만족스러운가?</div></li><li class="flex items-start"><div class="flex-shrink-0 w-8 h-8 bg-indigo-100 text-indigo-600 flex items-center justify-center rounded-full font-bold mr-4">4</div><div><strong class="block">가격 합리성 (10%)</strong>: 제공되는 가치에 비해 가격이 합리적인가? 무료 플랜은 충분한가?</div></li></ul></div>
+            </div>
+
+            <!-- Content Panel: About -->
+            <div id="about-content" class="tab-content hidden">
+                 <section class="text-center mb-16"><h1 class="text-4xl md:text-5xl font-black mb-4 text-gray-900 tracking-tight">About Us</h1><p class="text-lg text-gray-600 max-w-2xl mx-auto">AI의 파도 위에서 기회를 찾는 모든 이를 위한 안내서</p></section>
+                <div class="max-w-4xl mx-auto bg-white p-8 rounded-xl shadow-md text-center"><img src="https://placehold.co/150x150/4f46e5/ffffff?text=ME" alt="운영자 프로필 사진" class="w-32 h-32 rounded-full mx-auto mb-4"><h2 class="text-2xl font-bold mb-2">안녕하세요, AI 쌀먹러입니다.</h2><p class="text-gray-700 leading-relaxed">하루가 다르게 쏟아지는 AI 기술의 홍수 속에서, 저 또한 '무엇을 배워야 하고, 무엇을 써야 하는가'에 대한 깊은 고민에 빠졌습니다. <br><br>'AI 블랙 가이드'는 그 고민의 과정이자 결과물입니다. 제가 직접 수많은 AI 도구들을 사용해보고, 실패하고, 성공하며 얻은 경험들을 공유하기 위해 만들었습니다. 이 곳의 정보가 여러분이 AI라는 거대한 파도 위에서 길을 잃지 않고, 오히려 그 파도를 타고 멋지게 나아가는 데 작은 등대가 되기를 바랍니다.</p></div>
+            </div>
+
+            <!-- Content Panel: Terms -->
+            <div id="terms-content" class="tab-content hidden">
+                <section class="max-w-4xl mx-auto bg-white p-8 sm:p-12 rounded-xl shadow-md policy-content"><h1 class="text-3xl font-black text-center mb-10">이용약관</h1><h2>제1조 (목적)</h2><p>본 약관은 AI 블랙 가이드(이하 "사이트")에서 제공하는 모든 서비스(이하 "서비스")의 이용 조건 및 절차, 이용자와 사이트의 권리, 의무, 책임사항과 기타 필요한 사항을 규정함을 목적으로 합니다.</p><h2>제2조 (용어의 정의)</h2><p>본 약관에서 사용하는 용어의 정의는 다음과 같습니다.<br>1. "서비스"라 함은 사이트가 제공하는 AI 도구 리뷰, 비교 분석 정보 및 기타 관련 제반 서비스를 의미합니다.<br>2. "이용자"라 함은 본 약관에 따라 사이트가 제공하는 서비스를 받는 회원 및 비회원을 말합니다.</p><h2>제5조 (면책조항)</h2><p>1. 사이트는 천재지변 또는 이에 준하는 불가항력으로 인하여 서비스를 제공할 수 없는 경우에는 서비스 제공에 관한 책임이 면제됩니다.<br>2. 사이트에서 제공하는 정보는 정보 제공을 목적으로 하며, 그 내용의 완전성, 정확성, 신뢰성 등에 대해 어떠한 보증도 하지 않습니다. 정보의 사용으로 인해 발생하는 모든 결과에 대한 책임은 이용자 본인에게 있습니다.</p></section>
+            </div>
+
+            <!-- Content Panel: Privacy -->
+            <div id="privacy-content" class="tab-content hidden">
+                <section class="max-w-4xl mx-auto bg-white p-8 sm:p-12 rounded-xl shadow-md policy-content"><h1 class="text-3xl font-black text-center mb-10">개인정보처리방침</h1><h3>1. 개인정보의 수집 및 이용 목적</h3><p>AI 블랙 가이드는 다음의 목적을 위하여 개인정보를 처리합니다. 처리하고 있는 개인정보는 다음의 목적 이외의 용도로는 이용되지 않으며, 이용 목적이 변경되는 경우에는 별도의 동의를 받는 등 필요한 조치를 이행할 예정입니다.</p><ul><li>서비스 개선 및 통계 분석: 접속 빈도 파악 또는 회원의 서비스 이용에 대한 통계</li><li>광고 게재: 맞춤형 광고 제공 (Google AdSense 등)</li></ul><h3>5. 개인정보 보호책임자</h3><p>개인정보 처리에 관한 업무를 총괄해서 책임지고, 개인정보 처리와 관련한 정보주체의 불만처리 및 피해구제 등을 위하여 아래와 같이 개인정보 보호책임자를 지정하고 있습니다.</p><ul><li>이름: [담당자 이름]</li><li>이메일: [이메일 주소]</li></ul></section>
+            </div>
+
+            <!-- Content Panel: Contact -->
+            <div id="contact-content" class="tab-content hidden">
+                <section class="max-w-4xl mx-auto bg-white p-8 sm:p-12 rounded-xl shadow-md policy-content text-center"><h1 class="text-3xl font-black mb-6">문의하기</h1><p class="text-lg mb-8">AI 블랙 가이드에 대한 제휴, 광고, 기타 문의사항이 있으시면 아래 이메일로 연락주시기 바랍니다.</p><a href="mailto:contact@example.com" class="inline-block bg-indigo-600 text-white font-bold text-lg py-3 px-8 rounded-lg hover:bg-indigo-700 transition-colors">contact@example.com</a></section>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white mt-auto">
+        <div class="container mx-auto px-6 py-12">
+            <div class="grid md:grid-cols-3 gap-8">
+                <div>
+                    <div class="flex items-center space-x-2 mb-4"><span class="inline-block w-8 h-8 bg-indigo-500 rounded-lg"></span><span class="text-xl font-bold">AI 블랙 가이드</span></div>
+                    <p class="text-gray-400 text-sm">쏟아지는 AI 도구들 속에서 실용적인 가치를 찾아드립니다. 직접 써보고 분석한 리뷰와 비교를 만나보세요.</p>
+                </div>
+                <div>
+                    <h3 class="font-semibold mb-4 text-gray-200">바로가기</h3>
+                    <ul class="space-y-2 text-sm text-gray-400">
+                        <li><a href="#" data-tab-link="reviews" class="hover:text-white footer-link">AI 쌀먹지수</a></li>
+                        <li><a href="#" data-tab-link="comparison" class="hover:text-white footer-link">도구 비교</a></li>
+                        <li><a href="#" data-tab-link="hogaeng-prevention" class="hover:text-white footer-link">AI 호갱방지 가이드</a></li>
+                         <li><a href="#" data-tab-link="premium" class="hover:text-white footer-link">프리미엄 구독</a></li>
+                        <li><a href="#" data-tab-link="index-info" class="hover:text-white footer-link">쌀먹지수란?</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-semibold mb-4 text-gray-200">정책</h3>
+                    <ul class="space-y-2 text-sm text-gray-400">
+                        <li><a href="#" data-tab-link="terms" class="hover:text-white footer-link">이용약관</a></li>
+                        <li><a href="#" data-tab-link="privacy" class="hover:text-white footer-link">개인정보처리방침</a></li>
+                        <li><a href="#" data-tab-link="contact" class="hover:text-white footer-link">문의하기</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="mt-12 border-t border-gray-800 pt-8 text-center text-gray-500 text-sm"><p>&copy; 2025 AI 블랙 가이드. All Rights Reserved.</p></div>
+        </div>
+    </footer>
+
+
+    <script src="./data/reviewData.js"></script>
+    <script src="./data/comparisonData.js"></script>
+    <script src="./data/hogaengData.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            console.debug('DOMContentLoaded 이벤트 발생');
+            const reviewGrid = document.getElementById('review-grid');
+            const noResultsDiv = document.getElementById('no-results');
+            const loadingIndicator = document.getElementById('loading-indicator');
+            const categoryTabsContainer = document.getElementById('category-tabs');
+            const tabContents = document.querySelectorAll('.tab-content');
+            const allLinks = document.querySelectorAll('.footer-link, .nav-tab');
+            const searchForm = document.getElementById('search-form');
+            const searchInput = document.getElementById('search-input');
+            const FAVORITES_KEY = 'aiBlackGuideFavorites';
+
+            let favorites = [];
+
+            function loadFavorites() {
+                favorites = JSON.parse(localStorage.getItem(FAVORITES_KEY)) || [];
+            }
+            
+            function saveFavorites() {
+                localStorage.setItem(FAVORITES_KEY, JSON.stringify(favorites));
+            }
+
+            function createStarRating(score) {
+                const fullStars = Math.round(score / 2);
+                let starsHTML = '';
+                for (let i = 0; i < 5; i++) {
+                    starsHTML += i < fullStars ? '★' : '☆';
+                }
+                return starsHTML;
+            }
+
+            function renderCards(cards) {
+                if(!reviewGrid) return;
+                reviewGrid.innerHTML = '';
+
+                if (cards.length === 0) {
+                    noResultsDiv.classList.remove('hidden');
+                } else {
+                    noResultsDiv.classList.add('hidden');
+                }
+
+                cards.forEach(card => {
+                    console.debug(`리뷰 카드 렌더링: ID ${card.id}, 제목: ${card.title}`);
+                    const isFavorite = favorites.includes(card.id);
+                    const favoriteClass = isFavorite ? 'active' : '';
+                    const cardElement = `
+                        <article data-id="${card.id}" data-category="${card.category}" class="review-card card bg-white rounded-xl shadow-sm p-6 flex flex-col relative">
+                            <button class="favorite-btn absolute top-4 right-4 text-2xl ${favoriteClass}" aria-label="즐겨찾기">★</button>
+                            <div class="flex-grow">
+                                <div class="flex justify-between items-center mb-4 pr-8"><h3 class="text-2xl font-bold text-gray-900">${card.title}</h3><span class="bg-indigo-100 text-indigo-700 text-xs font-bold px-3 py-1 rounded-full">${card.tag}</span></div>
+                                <div class="mb-4"><span class="text-sm text-gray-500">${card.date}</span><div class="flex items-center mt-1"><span class="text-sm font-bold mr-2">AI 쌀먹지수</span><span class="star-rating">${createStarRating(card.score)}</span><span class="text-sm text-gray-600 font-medium ml-2">${card.score.toFixed(1)} / 10</span></div></div>
+                                <p class="text-gray-600 mb-6 text-sm leading-relaxed">${card.description}</p>
+                            </div>
+                            <a href="#" class="block w-full text-center bg-indigo-600 text-white font-semibold py-3 rounded-lg hover:bg-indigo-700 transition-colors">자세히 보기</a>
+                        </article>`;
+                    reviewGrid.innerHTML += cardElement;
+                });
+            }
+            
+            async function handleAiSearch(query) {
+                loadingIndicator.classList.remove('hidden');
+                reviewGrid.classList.add('hidden');
+                noResultsDiv.classList.add('hidden');
+                
+                const dataSummary = reviewData.map(d => `ID ${d.id}: ${d.title} - ${d.description} (카테고리: ${d.category}, 태그: ${d.tag})`).join('\n');
+                const prompt = `
+                    Here is a list of AI tools:\n${dataSummary}\n\n
+                    Based *only* on the list above, which tools are most relevant to the user's query: "${query}"?
+                    Please respond with a JSON array of the relevant tool IDs. For example: [1, 5, 3].
+                    If no tools are relevant, respond with an empty array [].
+                `;
+
+                try {
+                    const chatHistory = [{ role: "user", parts: [{ text: prompt }] }];
+                    const payload = { contents: chatHistory };
+                    const apiKey = ""; // API 키가 필요 없습니다
+                    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+                    
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`API call failed with status: ${response.status}`);
+                    }
+
+                    const result = await response.json();
+                    
+                    let relevantIds = [];
+                    if (result.candidates && result.candidates[0].content && result.candidates[0].content.parts[0]) {
+                        const textResponse = result.candidates[0].content.parts[0].text;
+                        const jsonMatch = textResponse.match(/\[(.*?)\]/);
+                        if(jsonMatch) {
+                           relevantIds = JSON.parse(jsonMatch[0]);
+                        }
+                    }
+
+                    const filteredCards = reviewData.filter(card => relevantIds.includes(card.id));
+                    renderCards(filteredCards);
+
+                } catch (error) {
+                    console.error("AI Search Error:", error);
+                    noResultsDiv.classList.remove('hidden');
+                    noResultsDiv.querySelector('p:last-child').textContent = 'AI 검색 중 오류가 발생했습니다.';
+                } finally {
+                    loadingIndicator.classList.add('hidden');
+                    reviewGrid.classList.remove('hidden');
+                }
+            }
+
+            function applyFilters() {
+                if (!categoryTabsContainer) return;
+                const activeCategoryEl = categoryTabsContainer.querySelector('.category-tab-active');
+                if (!activeCategoryEl) return;
+                const activeCategory = activeCategoryEl.dataset.category;
+
+                let filteredCards = reviewData;
+
+                if (activeCategory === 'favorites') {
+                    filteredCards = filteredCards.filter(card => favorites.includes(card.id));
+                } else if (activeCategory !== 'all') {
+                    filteredCards = filteredCards.filter(card => card.category === activeCategory);
+                }
+                
+                renderCards(filteredCards.sort((a,b) => b.score - a.score));
+            }
+
+            function switchTab(tabName) {
+                console.debug(`탭 전환: ${tabName}`);
+                document.querySelectorAll('.nav-tab').forEach(tab => {
+                    tab.classList.toggle('nav-tab-active', tab.dataset.tab === tabName);
+                });
+                tabContents.forEach(content => {
+                    content.classList.toggle('hidden', content.id !== `${tabName}-content`);
+                });
+                window.scrollTo(0, 0);
+
+                // 동적으로 콘텐츠 렌더링
+                if (tabName === 'reviews') {
+                    console.debug('리뷰 탭 활성화, 카드 필터 적용 시작');
+                    applyFilters();
+                } else if (tabName === 'comparison') {
+                    console.debug('도구 비교 탭 활성화, 비교 카드 렌더링 시작');
+                    renderComparisonCards(comparisonData[0]); // 현재는 첫 번째 비교 데이터만 사용
+                } else if (tabName === 'hogaeng-prevention') {
+                    console.debug('AI 호갱방지 탭 활성화, 호갱 카드 렌더링 시작');
+                    renderHogaengCards(hogaengData);
+                }
+            }
+            
+            function renderComparisonCards(comparison) {
+                console.debug(`비교 카드 렌더링 시작: ${comparison.title}`);
+                const comparisonGrid = document.getElementById('comparison-grid');
+                const comparisonVerdict = document.getElementById('comparison-verdict');
+                const verdictHeadline = document.getElementById('verdict-headline');
+                const verdictBody = document.getElementById('verdict-body');
+
+                if (!comparisonGrid || !comparisonVerdict) return;
+
+                comparisonGrid.innerHTML = '';
+                comparisonVerdict.classList.add('hidden'); // 초기에는 숨김
+
+                if (!comparison) {
+                    console.debug('비교 데이터가 없어 비교 카드를 렌더링할 수 없습니다.');
+                    return;
+                }
+
+                // 비교 타이틀 및 설명 업데이트 (현재 HTML에 직접 적용되어 있어 생략)
+                // document.querySelector('#comparison .text-center h1').textContent = comparison.title;
+                // document.querySelector('#comparison .text-center p').textContent = comparison.description;
+
+                comparison.tools.forEach(tool => {
+                    const review = reviewData.find(r => r.id === tool.id);
+                    if (review) {
+                        const isWinner = comparison.winner_id === review.id;
+                        const winnerBadge = isWinner ? `<div class="absolute top-0 right-0 winner-badge bg-indigo-600 text-white text-xs font-bold py-1 px-4">WINNER</div>` : '';
+                        const winnerBorderClass = isWinner ? 'winner-border' : '';
+                        const scoreColorClass = isWinner ? 'text-indigo-600' : 'text-gray-800';
+                        const scoreStarClass = isWinner ? 'star-rating' : 'star-rating'; // WINNER일 때만 색상 다르게 표시를 위해 분리했으나 현재 동일
+
+                        // TODO: features 필드가 없으므로 일단 ul, li 부분은 비워둡니다.
+                        const featuresHtml = review.features ? review.features.map(f => `<li class="flex items-start"><span class="mr-2 text-indigo-500">✔</span> <div><strong>${f.split(':')[0]}:</strong> ${f.split(':')[1]}</div></li>`).join('') : '';
+
+                        const cardElement = `
+                            <div class="card ${winnerBorderClass} bg-white rounded-xl shadow-lg p-8 relative overflow-hidden">
+                                ${winnerBadge}
+                                <h3 class="text-3xl font-bold text-gray-900 mb-2">${review.title}</h3>
+                                <p class="text-gray-500 mb-4">${tool.subtitle}</p>
+                                <div class="mb-4">
+                                    <span class="text-lg font-bold mr-2">AI 쌀먹지수</span>
+                                    <span class="text-2xl font-extrabold ${scoreColorClass}">${review.score.toFixed(1)} / 10</span>
+                                    <div class="${scoreStarClass} text-xl mt-1">${createStarRating(review.score)}</div>
+                                </div>
+                                <ul class="space-y-2 text-gray-700">
+                                    ${featuresHtml}
+                                </ul>
+                            </div>`;
+                        comparisonGrid.innerHTML += cardElement;
+                        console.debug(`비교 도구 렌더링: ${review.title}, 승자 여부: ${isWinner}`);
+                    }
+                });
+
+                // 최종 결론 렌더링
+                if (comparison.final_verdict) {
+                    verdictHeadline.textContent = comparison.final_verdict.headline;
+                    verdictBody.innerHTML = comparison.final_verdict.body.replace(/\n/g, '<br/>');
+                    comparisonVerdict.classList.remove('hidden');
+                    console.debug('최종 결론 렌더링 완료');
+                }
+            }
+
+            function renderHogaengCards(hogaengs) {
+                console.debug('호갱방지 카드 렌더링 시작');
+                const hogaengGrid = document.getElementById('hogaeng-grid');
+                if (!hogaengGrid) return;
+
+                hogaengGrid.innerHTML = '';
+
+                hogaengs.forEach(hogaeng => {
+                    const paidFeaturesHtml = hogaeng.paid_features.map(feature => `
+                        <li class="flex items-start"><span class="mr-2 text-green-500">✅</span>${feature}</li>
+                    `).join('');
+
+                    const cardElement = `
+                        <div class="bg-white rounded-2xl shadow-xl p-8 max-w-4xl mx-auto mb-12">
+                            <div class="md:flex md:space-x-8">
+                                <div class="md:w-1/3 text-center md:border-r md:pr-8 border-gray-200">
+                                    <h3 class="text-3xl font-bold text-gray-900">${hogaeng.title}</h3>
+                                    <p class="text-gray-500 mb-4">${hogaeng.subtitle}</p>
+                                    <div class="bg-green-50 rounded-xl p-4">
+                                        <span class="text-lg font-bold text-green-800">호갱탈출 지수</span>
+                                        <p class="text-5xl font-extrabold text-green-600 my-2">${hogaeng.hogaeng_score.toFixed(1)}<span class="text-2xl font-bold">/10</span></p>
+                                        <p class="text-green-700 font-semibold">"${hogaeng.verdict_quote}"</p>
+                                    </div>
+                                    <div class="mt-4 text-left">
+                                        <p class="font-bold">플랜: ${hogaeng.plan_name}</p>
+                                        <p class="font-bold">가격: ${hogaeng.price}</p>
+                                    </div>
+                                </div>
+                                <div class="md:w-2/3 mt-6 md:mt-0">
+                                    <h4 class="text-xl font-bold mb-3">그래서, 뭐가 좋은데? (유료 기능)</h4>
+                                    <ul class="space-y-2 text-gray-700 mb-6">
+                                        ${paidFeaturesHtml}
+                                    </ul>
+                                    <h4 class="text-xl font-bold mb-3">공동 구독하면 더 이득?</h4>
+                                    <p class="text-gray-700">${hogaeng.tip.replace(/\n/g, '<br/>')}</p>
+                                </div>
+                            </div>
+                        </div>`;
+                    hogaengGrid.innerHTML += cardElement;
+                    console.debug(`호갱방지 카드 렌더링: ${hogaeng.title}`);
+                });
+                console.debug('호갱방지 카드 렌더링 완료');
+            }
+
+            function handleFavoriteClick(e) {
+                const target = e.target.closest('.favorite-btn');
+                if (target) {
+                    const cardElement = target.closest('.review-card');
+                    const cardId = parseInt(cardElement.dataset.id, 10);
+                    
+                    const index = favorites.indexOf(cardId);
+                    if (index > -1) {
+                        favorites.splice(index, 1);
+                    } else {
+                        favorites.push(cardId);
+                    }
+                    saveFavorites();
+                    applyFilters();
+                }
+            }
+            
+            if(categoryTabsContainer) {
+                categoryTabsContainer.addEventListener('click', (event) => {
+                    const target = event.target.closest('button');
+                    if (!target) return;
+                    
+                    const currentActive = categoryTabsContainer.querySelector('.category-tab-active');
+                    currentActive.classList.replace('category-tab-active', 'category-tab-inactive');
+                    target.classList.replace('category-tab-inactive', 'category-tab-active');
+                    
+                    searchInput.value = ""; // 카테고리 변경 시 검색어 초기화
+                    applyFilters();
+                });
+            }
+
+            allLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const tabName = e.currentTarget.dataset.tab || e.currentTarget.dataset.tabLink;
+                    if(tabName) {
+                        switchTab(tabName);
+                    }
+                });
+            });
+            
+            if (searchForm) {
+                searchForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    const query = searchInput.value.trim();
+                    if (query) {
+                        // 검색 시 '전체' 카테고리 활성화
+                        const currentActive = categoryTabsContainer.querySelector('.category-tab-active');
+                        currentActive.classList.replace('category-tab-active', 'category-tab-inactive');
+                        categoryTabsContainer.querySelector('[data-category="all"]').classList.replace('category-tab-inactive', 'category-tab-active');
+                        handleAiSearch(query);
+                    }
+                });
+            }
+
+            if (reviewGrid) reviewGrid.addEventListener('click', handleFavoriteClick);
+
+            loadFavorites();
+            applyFilters();
+        });
+    </script>
+</body>
+</html>
