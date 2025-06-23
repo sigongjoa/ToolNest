@@ -10,16 +10,17 @@
     "tsBuildInfoFile": "./node_modules/typescript/tsbuildinfo",
     "noEmit": true,
     "target": "ESNext",
-    "module": "ESNext",
+    "module": "NodeNext",
     "strict": true,
     "lib": ["esnext", "dom", "dom.iterable"],
     "jsx": "react-jsx",
     "esModuleInterop": true,
     "skipLibCheck": true,
     "allowImportingTsExtensions": true,
-    "moduleResolution": "node",
+    "moduleResolution": "NodeNext",
     "baseUrl": ".",                // 루트 폴더 기준
     "types": ["node"],
+    "typeRoots": ["./node_modules/@types"],
     "paths": {
     }
   }
