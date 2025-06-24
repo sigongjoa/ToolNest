@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 블랙 가이드 - 상세 리뷰</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #f9fafb;
+        }
+        .post-content h2 {
+            font-size: 1.875rem; /* 30px */
+            font-weight: 800;
+            margin-top: 3rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid #e5e7eb;
+        }
+        .post-content h3 {
+            font-size: 1.5rem; /* 24px */
+            font-weight: 700;
+            margin-top: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        .post-content p, .post-content li {
+            font-size: 1.125rem; /* 18px */
+            line-height: 1.8;
+            color: #374151; /* gray-700 */
+        }
+        .post-content ul {
+            list-style-type: disc;
+            padding-left: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .post-content blockquote {
+            border-left: 4px solid #4f46e5;
+            padding-left: 1.5rem;
+            margin: 2rem 0;
+            font-style: italic;
+            color: #4b5563;
+        }
+        .post-content img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 0.75rem; /* 12px */
+            margin-top: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        }
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <header class="w-full bg-white/80 backdrop-blur-sm shadow-sm sticky top-0 z-50">
+        <nav class="container mx-auto px-6 flex justify-between items-center h-20">
+            <a href="index.html" class="flex items-center space-x-2">
+                <span class="inline-block w-8 h-8 bg-indigo-600 rounded-lg"></span>
+                <span class="text-xl font-bold text-gray-900">AI 블랙 가이드</span>
+            </a>
+            <div>
+                <a href="index.html" class="font-semibold text-indigo-600 hover:underline">리뷰 목록으로 돌아가기</a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container mx-auto px-6 py-12">
+        <article class="max-w-4xl mx-auto">
+            <!-- Post Header -->
+            <header class="mb-12">
+                <span class="text-indigo-600 font-semibold">AI 툴 상세 리뷰</span>
+                <h1 id="review-title" class="text-4xl md:text-5xl font-black my-4 text-gray-900 tracking-tight"></h1>
+                <p id="review-description" class="text-xl text-gray-500"></p>
+                <div class="mt-6 text-sm text-gray-500">
+                    <span id="review-date"></span> | <span>작성자: AI 쌀먹러</span>
+                </div>
+            </header>
+
+            <!-- Key Summary Section -->
+            <section class="mb-16 bg-white rounded-2xl shadow-lg p-8">
+                <h2 class="text-2xl font-bold text-center mb-6">핵심 요약</h2>
+                <div class="grid md:grid-cols-2 gap-8 text-center">
+                    <div>
+                        <p class="text-lg font-semibold text-gray-500">AI 쌀먹지수</p>
+                        <p class="text-5xl font-extrabold text-indigo-600"><span id="review-score"></span><span class="text-2xl">/10</span></p>
+                        <p id="review-verdict-quote" class="mt-2 font-medium"></p>
+                    </div>
+                     <div>
+                        <p class="text-lg font-semibold text-gray-500">호갱탈출 지수 (Pro 플랜)</p>
+                        <p class="text-5xl font-extrabold text-green-600"><span id="hogaeng-score"></span><span class="text-2xl">/10</span></p>
+                        <p id="hogaeng-verdict-quote" class="mt-2 font-medium"></p>
+                    </div>
+                </div>
+                <div class="mt-8 pt-6 border-t">
+                     <p class="text-lg font-semibold text-center mb-3">세 줄 요약</p>
+                    <ul id="review-summary-list" class="space-y-2 text-gray-700">
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Main Post Content -->
+            <div id="post-content" class="post-content">
+            </div>
+        </article>
+    </main>
+
+    <footer class="bg-gray-900 text-white mt-auto">
+        <div class="container mx-auto px-6 py-12 text-center">
+             <p>&copy; 2025 AI 블랙 가이드. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <script src="./data/reviewData.js"></script>
+    <script src="./data/hogaengData.js"></script>
+    <script>
+        // URL에서 리뷰 ID를 가져오는 함수
+        function getReviewIdFromUrl() {
+            console.debug('URL에서 리뷰 ID 가져오기 시작');
+            const urlParams = new URLSearchParams(window.location.search);
+            const id = parseInt(urlParams.get('id'), 10);
+            console.debug(`URL에서 가져온 리뷰 ID: ${id}`);
+            return isNaN(id) ? null : id;
+        }
+
+        // 상세 리뷰 페이지를 렌더링하는 함수
+        function renderReviewDetail(reviewId) {
+            console.debug(`상세 리뷰 렌더링 시작: ID ${reviewId}`);
+            const review = reviewData.find(r => r.id === reviewId);
+            const hogaengReview = hogaengData.find(h => h.id === (reviewId + 200)); // 가정: hogaengData ID는 reviewData ID + 200
+
+            if (!review) {
+                console.error('리뷰 데이터를 찾을 수 없습니다.', reviewId);
+                // 404 페이지 또는 에러 메시지 표시
+                document.querySelector('main').innerHTML = '<p class="text-center text-red-500 text-xl">리뷰를 찾을 수 없습니다.</p>';
+                return;
+            }
+
+            // 제목 및 요약 정보 업데이트
+            document.title = `${review.title} 상세 리뷰 - AI 블랙 가이드`;
+            document.getElementById('review-title').textContent = review.title;
+            document.getElementById('review-description').textContent = review.description;
+            document.getElementById('review-date').textContent = `작성일: ${review.date.replace(/-/g, '년 ' + (parseInt(review.date.substring(5,7)) -1 ) + '월 ') + '일'}`;
+
+            // AI 쌀먹지수 업데이트
+            document.getElementById('review-score').textContent = review.score.toFixed(1);
+            // TODO: reviewData에 verdict_quote 필드 추가 필요
+            document.getElementById('review-verdict-quote').textContent = `"${review.description}"`; // 임시로 description 사용
+
+            // 호갱탈출 지수 업데이트 (hogaengReview가 있을 경우)
+            if (hogaengReview) {
+                document.getElementById('hogaeng-score').textContent = hogaengReview.hogaeng_score.toFixed(1);
+                document.getElementById('hogaeng-verdict-quote').textContent = `"${hogaengReview.verdict_quote}"`;
+            } else {
+                document.getElementById('hogaeng-score').closest('div').innerHTML = '<p class="text-lg font-semibold text-gray-500">호갱탈출 지수</p><p class="text-gray-400 mt-2">정보 없음</p>';
+            }
+
+            // 세 줄 요약 업데이트 (임시 데이터)
+            const summaryList = document.getElementById('review-summary-list');
+            summaryList.innerHTML = '';
+            const tempSummaries = [
+                `<strong>1.</strong> ${review.description}의 핵심적인 장점 A`, 
+                `<strong>2.</strong> ${review.description}의 핵심적인 장점 B`, 
+                `<strong>3.</strong> ${review.description}의 핵심적인 장점 C`
+            ]; // 실제 데이터는 reviewData에 추가해야 합니다.
+            tempSummaries.forEach(summary => {
+                const li = document.createElement('li');
+                li.className = 'flex items-start';
+                li.innerHTML = `<span class="mr-3 text-indigo-500 font-bold"></span>${summary}`; // 숫자 제거, bold는 이미 포함
+                summaryList.appendChild(li);
+            });
+
+            // 본문 콘텐츠 업데이트 (임시 데이터)
+            const postContentDiv = document.getElementById('post-content');
+            postContentDiv.innerHTML = `
+                <h2>그래서, 뭐가 좋은데? (장점)</h2>
+                <h3>${review.title}의 압도적인 장점</h3>
+                <p>${review.description}에 대한 더 자세한 설명입니다. 이 도구는 사용자에게 놀라운 경험을 제공합니다.</p>
+                <img src="https://placehold.co/800x450/e0e7ff/3730a3?text=${review.title}+%EC%9E%91%EC%97%85+%ED%99%94%EB%A9%B4" alt="${review.title} 작업 화면 예시">
+                <blockquote>"이 도구를 사용하면 ${review.description}을(를) 훨씬 효율적으로 처리할 수 있습니다."</blockquote>
+                <h2>아쉬운 점은? (단점)</h2>
+                <h3>개선이 필요한 부분</h3>
+                <p>${review.title}은(는) 몇 가지 아쉬운 점도 있습니다. 예를 들어, 특정 기능의 디테일한 컨트롤이 부족할 수 있습니다.</p>
+                <h3>반응 속도</h3>
+                <p>간혹 반응 속도가 느리게 느껴질 수 있지만, 전반적인 생산성 향상에 비하면 미미한 수준입니다.</p>
+                <h2>이럴 때 쓰세요! (실무 팁)</h2>
+                <ul>
+                    <li><strong>팁 1:</strong> ${review.title}을(를) 활용하여 ${review.tag} 작업을 자동화해보세요.</li>
+                    <li><strong>팁 2:</strong> 복잡한 ${review.tag} 문제를 해결할 때 ${review.title}의 AI 기능을 적극 활용하세요.</li>
+                    <li><strong>팁 3:</strong> ${review.title}의 최신 업데이트를 주시하여 새로운 기능을 놓치지 마세요.</li>
+                </ul>
+                <h2>결론: ${review.title}는 ${review.score.toFixed(1)}점!</h2>
+                <p>${review.title}은(는) ${review.description}을(를) 위한 강력한 도구입니다. 당신의 ${review.tag} 작업에 혁신을 가져올 것입니다.</p>
+            `;
+            console.debug('상세 리뷰 렌더링 완료');
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            console.debug('review-detail.html DOMContentLoaded 이벤트 발생');
+            const reviewId = getReviewIdFromUrl();
+            if (reviewId) {
+                renderReviewDetail(reviewId);
+            } else {
+                console.error('URL에 리뷰 ID가 없습니다. 리뷰 목록으로 리다이렉트합니다.');
+                // ID가 없으면 리뷰 목록 페이지로 리다이렉트
+                window.location.href = 'index.html';
+            }
+        });
+    </script>
+</body>
+</html> 

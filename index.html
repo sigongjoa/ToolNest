@@ -270,7 +270,7 @@
                                 <div class="mb-4"><span class="text-sm text-gray-500">${card.date}</span><div class="flex items-center mt-1"><span class="text-sm font-bold mr-2">AI 쌀먹지수</span><span class="star-rating">${createStarRating(card.score)}</span><span class="text-sm text-gray-600 font-medium ml-2">${card.score.toFixed(1)} / 10</span></div></div>
                                 <p class="text-gray-600 mb-6 text-sm leading-relaxed">${card.description}</p>
                             </div>
-                            <a href="#" class="block w-full text-center bg-indigo-600 text-white font-semibold py-3 rounded-lg hover:bg-indigo-700 transition-colors">자세히 보기</a>
+                            <a href="review-detail.html?id=${card.id}" class="block w-full text-center bg-indigo-600 text-white font-semibold py-3 rounded-lg hover:bg-indigo-700 transition-colors">자세히 보기</a>
                         </article>`;
                     reviewGrid.innerHTML += cardElement;
                 });
